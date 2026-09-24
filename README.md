@@ -16,7 +16,7 @@ sales commissions for the sales associate.
 
 ## Initial Project Goals
 Our initial goals include the following:
-- Create a SCUM board for our meetings and progress tracking
+- Create a SCRUM board for our meetings and progress tracking
 - Break the project into different sections so our group can manage it easier
 - Begin making a list for our product backlog
 - Begin work on a use case model for Checkpoint 3
@@ -24,3 +24,5 @@ Our initial goals include the following:
 ## Team Roles
 Jacob - Interface 4
 Matthew - Interface 2
+Vincent - Interface 1
+Bridger - Interface 3
