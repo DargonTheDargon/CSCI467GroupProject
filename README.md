@@ -22,10 +22,10 @@ Our initial goals include the following:
 - Begin work on a use case model for Checkpoint 3
 
 ## Team Roles
-Jacob - Interface 4
-Matthew - Interface 2
-Vincent - Interface 1
-Bridger - Interface 3
+- Jacob - Interface 4
+- Matthew - Interface 2
+- Vincent - Interface 1
+- Bridger - Interface 3
 
 ## Communication Method
 We will be using Discord for our communication method. All of our meetings will take place in our group chat.
