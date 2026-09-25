@@ -20,6 +20,7 @@ Our initial goals include the following:
 - Break the project into different sections so our group can manage it easier
 - Begin making a list for our product backlog
 - Begin work on a use case model for Checkpoint 3
+- Begin creating a database model
 
 ## Team Roles
 - Jacob - Interface 4
