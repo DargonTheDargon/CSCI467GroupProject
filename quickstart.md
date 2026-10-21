@@ -6,7 +6,7 @@ Once you downloaded python, run the command:
 pip install django
 ```
 
-Install UV that makes it super easy to sync project dependencies across our repos
+Install UV, used for running a small virtual environment in the project, and lets us install multiple versions of python and sync our python dependencies together
 
 ```
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
