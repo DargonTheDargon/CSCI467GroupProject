@@ -33,6 +33,11 @@ run:
 uv add django
 ```
 
+activate the virtual environment:
+```
+.venv/Scripts/Activate
+```
+
 run:
 
 ```
