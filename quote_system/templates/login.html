@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Needed for mobile scaling -->
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}"> <!-- Link to login CSS file -->
+</head>
+<body>
+    <div class="login-container"> <!-- Container for the login form -->
+        <!-- Center the Image-->
+         <img src="{% static 'images/quick_quotes_logo.png' %}" alt="Logo" class="login-logo">
+        
+        <!-- LoginForm Content-->
+        <form action="" method="post" class="login-form">
+            <!-- Necessary for CSRF protection in Django forms -->
+            {% csrf_token %}
+
+            <input type="text" id="username" name="username" placeholder="Username" required>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+    </div> <!-- End of login container -->
+</body>
+</html>
