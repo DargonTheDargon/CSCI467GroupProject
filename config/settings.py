@@ -101,6 +101,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = "quote_system.User"
 
+LOGIN_REDIRECT_MODEL = "interface1/"
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 

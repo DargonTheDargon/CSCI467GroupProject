@@ -15,10 +15,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from quote_system import views
+from django.urls import include, path
 
 urlpatterns = [
+    path("", include("quote_system.urls")),
     path('admin/', admin.site.urls),
-    path('', views.login_page, name='login'), # Login page as the home page
 ]
