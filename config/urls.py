@@ -20,5 +20,10 @@ from quote_system import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.login_page, name='login'), # Login page as the home page
+    path('', views.login_page, name='login'),
+    path('quotes/', views.quote_list, name='quote_list'),
+    path('sanction-interface/', views.sanction_interface, name='sanction_interface'),
+    path('purchase-orders/', views.purchase_orders, name='purchase_orders'),
+    path('associates/', views.associates, name='associates'),
+    path('logout/', views.logout_page, name='logout')
 ]

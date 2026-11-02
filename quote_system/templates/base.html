@@ -1,0 +1,41 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <title>{% block title %}Quick Quotes{% endblock %}</title>
+</head>
+<body>
+    <header class="topbar">
+        <details class="nav-menu">
+            <summary aria-label="Toggle navigation menu">☰</summary>
+            <nav class="side-menu" aria-label="Main navigation">
+                <a href="{% url 'quote_list' %}">Quote List</a>
+                <a href="{% url 'sanction_interface' %}">Sanction Interface</a>
+                <a href="{% url 'purchase_orders' %}">Purchase Orders</a>
+                <a href="{% url 'associates' %}">Associates</a>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-link">Log Out</button>
+                </form>
+            </nav>
+        </details>
+
+        <div class="topbar-actions">
+            <button type="button" id="search-toggle" aria-label="Open search">Search</button>
+            <button type="button" class="sort-button" aria-label="Sort">Sort</button>
+        </div>
+    </header>
+
+    <form id="search-bar" hidden role="search">
+        <label for="search-input">Search</label>
+        <input id="search-input" type="search">
+    </form>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
