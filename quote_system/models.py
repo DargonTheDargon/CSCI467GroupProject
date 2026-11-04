@@ -78,7 +78,7 @@ class LineItem(models.Model):
         Quote, on_delete=models.CASCADE, related_name="line_items"
     )
     description = models.CharField(max_length=200)
-    price = models.DecimalField()
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
         return self.description

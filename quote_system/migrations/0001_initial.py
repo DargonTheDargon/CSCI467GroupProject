@@ -97,7 +97,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('description', models.CharField(max_length=200)),
-                ('price', models.DecimalField()),
+                ('price', models.DecimalField(decimal_places=2, default=0, max_digits=10)),
                 ('quote', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='line_items', to='quote_system.quote')),
             ],
         ),

@@ -1,8 +1,12 @@
-from django.urls import include, path
+from django.urls import path
 
 from . import views
 
 urlpatterns = [
-    path("interface1/", views.interface1, name="interface1"),
-    path("accounts/", include("django.contrib.auth.urls")),
+    path('', views.login_page, name='login'),
+    path('quotes/', views.quote_list, name='quote_list'),
+    path('sanction-interface/', views.sanction_interface, name='sanction_interface'),
+    path('purchase-orders/', views.purchase_orders, name='purchase_orders'),
+    path('associates/', views.associates, name='associates'),
+    path('logout/', views.logout_page, name='logout')
 ]
