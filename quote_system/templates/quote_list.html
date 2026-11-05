@@ -1,26 +1,25 @@
 {% extends "base.html" %}
-
 {%load static%}
 
 <!-- This page's content -->
 <!doctype html>
 <html>
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="{% static 'css/base.css' %}">
+        {% block quotecss %}
+        <link rel="stylesheet" href="{% static 'css/quote_list.css' %}">
+        {% endblock%}
         <title>{% block title %}Quote List{% endblock %}</title>
     </head>
-    <body>
-        {% block topbar_buttons %}
-        <div class="topbar" id="buttons">
-            <div class="topbar-actions">
-                <button type="button" id="search-toggle" aria-label="Open search">Search</button>
-                <button type="button" class="sort-button" aria-label="Sort" popovertarget="dropdown-menu">Sort</button>
-            </div>
+    {% block topbar_buttons %}
+    <header class="topbar" id="buttons">
+        <div class="topbar-actions">
+            <button type="button" id="search-toggle" aria-label="Open search">Search</button>
+            <button type="button" class="sort-button" aria-label="Sort" popovertarget="dropdown-menu">Sort</button>
         </div>
-        {% endblock %}
-
+    </header>
+    {% endblock %}
+    
+    <body>
         {% block content %}
             <div id="dropdown-menu" popover="auto" class="side-menu">
                 <ul role="menu">
@@ -32,9 +31,9 @@
             </div>
             <ul class="quote_list">
                 {% for quote in quote_list %}
-                    <li>
+                    <li role="quote-item">
                         Quote for {{quote.customer}}  </br>
-                        <p> <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="green"/></svg> Draft </p>
+                        <p> <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="green"/></svg> {{quote.status}} </p>
                     </li>
                 {% endfor %}
             </ul>
