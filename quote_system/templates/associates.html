@@ -1,7 +1,48 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Associates{% endblock %}
 
 {% block content %}
-    <!-- This page's content -->
+<!-- Link to associates CSS file (temporary until base.html has a head block for page styles) -->
+<link rel="stylesheet" href="{% static 'css/associates.css' %}">
+
+<div class="associates-container"> <!-- Container for the associates page -->
+    <h1>Associates</h1>
+
+    <!-- Placeholder link until the Add Associate page exists -->
+    <a href="#" class="associates-add-associate-link">+ Add Associate</a>
+
+    <div class="associates-table-wrapper"> <!-- Lets the table scroll sideways on small screens -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th> <!-- possibly temporary if we decide to remove emails -->
+                    <th>Full Name</th>
+                    <th>Accumulated Commission</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for associate in sales_associates %}
+                <tr>
+                    <td>{{ associate.user.username }}</td>
+                    <td>{{ associate.user.email }}</td> <!-- possibly temporary if we decide to remove emails -->
+                    <td>{{ associate.user.first_name }} {{ associate.user.last_name }}</td>
+                    <td>{{ associate.accumulated_commission }}</td>
+                    <td>
+                        <a href="#" class="associates-action-link">Edit</a>
+                        <a href="#" class="associates-action-link">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="associates-empty">No associates found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div> <!-- End of associates container -->
 {% endblock %}

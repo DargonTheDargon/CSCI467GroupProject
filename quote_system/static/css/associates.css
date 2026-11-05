@@ -1,0 +1,93 @@
+/* Mobile Container Sizing */
+.associates-container {
+    width: 100%;
+    max-width: 100%; /* To span the full width on mobile devices */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #000000;
+    background-color: #ffffff;
+    padding: 20px 10px;
+    margin: 0 auto;
+}
+
+/*Add Associate Button Styling */
+.associates-button {
+    background-color: #ff9800;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.associates-add-associate-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #ff9800;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.associates-add-associate-link:hover {
+    text-decoration: underline;
+    color: #e68a00;
+}
+
+.associates-action-link {
+    color: #ff9800;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.associates-action-link:hover {
+    text-decoration: underline;
+    color: #e68a00;
+}
+
+/* Table Styling */
+.associates-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.associates-table-wrapper {
+    width: 100%;
+    overflow-x: auto; /*For mobile devices*/
+}
+
+.associates-container th,
+.associates-container td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    color: #000000;
+}
+
+.associates-container th {
+    background-color: #ff9800;
+    color: #ffffff;
+}
+
+.associates-container tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.associates-container tbody tr:hover {
+    background-color: #fff0d9;
+}
+
+.associates-empty {
+    text-align: center;
+    padding: 20px;
+}
+
+@media (min-width: 480px) {
+    .associates-container {
+        max-width: 800px;
+        padding: 40px;
+    }
+}
