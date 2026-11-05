@@ -10,11 +10,16 @@ body {
 .topbar {
     position: relative;
     min-height: 4rem;
-    padding: 0.5rem 1rem;
+    padding: 0rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: #ff9800;
+}
+
+#buttons.topbar {
+    display: flex;
+    justify-content: right;
 }
 
 .nav-menu {
@@ -84,7 +89,7 @@ body {
 
 .topbar-actions {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: stretch;
 }
 
