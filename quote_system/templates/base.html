@@ -25,7 +25,16 @@
 
         <div class="topbar-actions">
             <button type="button" id="search-toggle" aria-label="Open search">Search</button>
-            <button type="button" class="sort-button" aria-label="Sort">Sort</button>
+            <button type="button" class="sort-button" aria-label="Sort" popovertarget="dropdown-menu">Sort</button>
+
+            <div id="dropdown-menu" popover="auto" class="side-menu">
+                <ul role="menu">
+                    <li role="menuitem"><a href="{% querystring sort="status" %}">Status Ascending</a></li>
+                    <li role="menuitem"><a href="{% querystring sort="-status" %}">Status Descending</a></li>
+                    <li role="menuitem"><a href="{% querystring sort="id" %}">ID Ascending</a></li>
+                    <li role="menuitem"><a href="{% querystring sort="-id" %}">ID Descending</a></li>
+                </ul>
+            </div>
         </div>
     </header>
 

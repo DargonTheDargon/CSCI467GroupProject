@@ -2,6 +2,20 @@
 
 {% block title %}Quote List{% endblock %}
 
+
 {% block content %}
     <!-- This page's content -->
+<!doctype html>
+    <html>
+        <head>
+            <title>List of quotes</title>
+        </head>
+        <body>
+            <ul class="quote_list">
+                {% for quote in quote_list %}
+                    <li>{{quote.id}} {{quote.status}}</li>
+                {% endfor %}
+            </ul>
+        </body>
+    </html>
 {% endblock %}
