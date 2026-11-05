@@ -28,7 +28,9 @@ def quote_list(request):
 
 @login_required
 def sanction_interface(request):
-    return render(request, 'sanction_interface.html')
+    actions = {'edit', 'apply_discount', 'secret_notes', 'sanction'}
+    show_no_quote_error = (request.method == 'POST' and request.POST.get('action') in actions)
+    return render(request, 'sanction_interface.html', {'show_no_quote_error': show_no_quote_error})
 
 @login_required
 def purchase_orders(request):

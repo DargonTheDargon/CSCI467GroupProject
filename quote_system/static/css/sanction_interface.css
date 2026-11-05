@@ -1,0 +1,106 @@
+.sanction-container {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #000000;
+    background-color: #ffffff;
+    padding: 20px 10px;
+    margin: 0 auto;
+}
+
+.sanction-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.sanction-error {
+    box-sizing: border-box;
+    width: 80%;
+    margin: 20px 0 0;
+    padding-right: 12px;
+    color: #d00000;
+    font-weight: bold;
+    text-align: right;
+    animation: sanction-error-timeout 5s forwards;
+}
+
+@keyframes sanction-error-timeout {
+    to {
+        visibility: hidden;
+        opacity: 0;
+    }
+}
+
+.sanction-container table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin-top: 0;
+}
+
+.sanction-quotes-column {
+    width: 80%;
+}
+
+.sanction-options-column {
+    width: 20%;
+}
+
+.sanction-options-cell {
+    vertical-align: middle;
+}
+
+.sanction-options {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.sanction-options button {
+    width: 100%;
+    max-width: 160px;
+    height: 36px;
+    padding: 0 4px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ff9800;
+    color: #ffffff;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+}
+
+.sanction-options button:hover {
+    background-color: #e68a00;
+}
+
+.sanction-container th,
+.sanction-container td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    color: #000000;
+}
+
+.sanction-container th {
+    background-color: #ff9800;
+    color: #ffffff;
+}
+
+.sanction-container tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.sanction-container tbody td:hover {
+    background-color: #fff0d9;
+}
+
+@media (min-width: 480px) {
+    .sanction-container {
+        max-width: 800px;
+        padding: 40px;
+    }
+}

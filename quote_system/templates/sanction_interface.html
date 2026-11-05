@@ -1,7 +1,46 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Sanction Interface{% endblock %}
 
 {% block content %}
-    <!-- This page's content -->
+<link rel="stylesheet" href="{% static 'css/sanction_interface.css' %}">
+
+<div class="sanction-container">
+    <h1>Sanction Interface</h1>
+
+    <div class="sanction-table-wrapper">
+        {% if show_no_quote_error %}
+        <p id="sanction-error" class="sanction-error" role="alert">
+            Error: No Quote Selected
+        </p>
+        {% endif %}
+        <table>
+            <colgroup>
+                <col class="sanction-quotes-column">
+                <col class="sanction-options-column">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th scope="col">Quotes</th>
+                    <th scope="col">Options</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td class="sanction-options-cell">
+                        <form method="post" class="sanction-options">
+                            {% csrf_token %}
+                            <button type="submit" name="action" value="edit">Edit</button>
+                            <button type="submit" name="action" value="apply_discount">Apply Discount</button>
+                            <button type="submit" name="action" value="secret_notes">Secret Note(s)</button>
+                            <button type="submit" name="action" value="sanction">Sanction</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}
