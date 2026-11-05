@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate, login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
+from .models import SalesAssociate
 
 # Create your views here.
 
@@ -35,4 +36,5 @@ def purchase_orders(request):
 
 @login_required
 def associates(request):
-    return render(request, 'associates.html')
+    sales_associates = SalesAssociate.objects.select_related('user').order_by('user__username')
+    return render(request, 'associates.html', {'sales_associates': sales_associates})
