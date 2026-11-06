@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<html>
+    <head>
+        {% block quotecss %}
+        <link rel="stylesheet" href="{% static 'css/quote_view.css' %}">
+        {% endblock%}
+        <title>{% block title %}Quote List{% endblock %}</title>
+    </head>
+
+    <body>
+        <div class="frame">
+            <p> {{quote.id}} {{quote.customer}} </p>
+            <div class="line-item-list">
+                <ul>
+                    {% for line_item in quote.line_items.all %}
+                    <li>
+                        <div class="line_item">
+                            <div class="description">
+                            <p>{{ line_item.description }}</p> 
+                            </div>
+                            <div class="price">
+                                <div class="quantity">
+                                    <p class="label"> Qty. </p>
+                                    <p class="amount"> {{ line_item.quantity}} </p>
+                                </div>
+                                <div class="unit_price">
+                                    <p class="label"> Unite Price</p>
+                                    <p class="amount">${{line_item.price}}<p>
+                                </div>
+                                <div class="total_price">
+                                    <p class="label">Total Price</p>
+                                    <p class="amount">${{line_item.total_price}}<p>
+                                </div>
+                                <div class="delete">
+                                    <p>🗑️<p>
+                                </div>
+                            </div>  
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <p>{{quote.total_price}}</p>
+        </div>  
+    </body> 
+</html>
+    {% endblock%}

@@ -32,7 +32,9 @@
             <ul class="quote_list">
                 {% for quote in quote_list %}
                     <li role="quote-item">
-                        Quote for {{quote.customer}}  </br>
+                        <a href = "{% url 'quote_view' quote.pk %}">
+                        Quote for {{quote.customer}} by {{quote.sales_associate.user.first_name}} 
+                        {{quote.sales_associate.user.last_name}}</a> </br>
                         <p> <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="green"/></svg> {{quote.status}} </p>
                     </li>
                 {% endfor %}

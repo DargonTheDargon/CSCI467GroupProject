@@ -5,7 +5,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
-from django.views.generic import ListView
+from django.views.generic import DetailView, ListView
 
 from .models import Quote
 
@@ -29,6 +29,10 @@ def login_page(request):
 @login_required
 def quote_list(request):
     return render(request, 'quote_list.html')
+
+@login_required
+def quote_view(request):
+    return render(request, 'quote_view.html')
 
 @login_required
 def sanction_interface(request):
@@ -58,3 +62,14 @@ class QuoteListView(ListView):
             elif sort == "-id":
                 queryset = queryset.order_by("-id")
         return queryset
+
+class QuoteView(DetailView):
+    template_name = 'quote_view.html'
+
+    def get_queryset(self):
+        quote_id=self.kwargs.get('pk')
+        return Quote.objects.filter(pk=quote_id)
+    
+
+
+    
