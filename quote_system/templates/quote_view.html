@@ -12,7 +12,15 @@
 
     <body>
         <div class="frame">
-            <p> {{quote.id}} {{quote.customer}} </p>
+            <div class="contact_info">
+                <h3> Quote #{{quote.id}} for {{quote.customer}}</h3>
+                <p class="label">Customer Address</p>
+                <p style="margin-block-start: 0.1em;"> {{quote.customer.address}} </p>
+                <p class="label">Customer Contact</p>
+                <p style="margin-block-start: 0.1em;"> {{quote.customer.email}} </p>
+                <p class="label">Sales Associate: </p>
+                <p style="margin-block-start: 0.1em;"> {{quote.sales_associate.user.first_name}} {{quote.sales_associate.user.last_name}} </p>
+            </div>
             <div class="line-item-list">
                 <ul>
                     {% for line_item in quote.line_items.all %}
@@ -81,8 +89,25 @@
                     <button type="submit" name="add_discount">Apply Discount</button>
                 </form>
             </div>
-            <p>{{quote.total_price}}</p>
-
+            <div class="totals">
+                <p class="amount">Subtotal:    ${{quote.subtotal_price}}</p>
+                {% if quote.discount_type == 'percent'%}
+                <p class="amount">Discount: %{{quote.discount_amount}}</p>
+                {% elif quote.discount_type == 'flat' %}
+                <p class="amount">Discount: ${{quote.discount_amount}}</p>
+                {% endif %}
+                <p class="amount">Total Price: ${{quote.total_price}}</p>
+            </div>
+            <div class="finalize">
+                <form method="post">
+                    {% csrf_token %}
+                    {% if quote.status == 'draft'%}
+                    <button type="submit" name="finalize">Finalize Quote</button>
+                    {% elif quote.status == 'finalized' %}
+                    <button type="submit" name="unfinalize">Unfinalize Quote</button>
+                    {% endif %}
+                </form>
+            </div>
         </div>
     </body> 
 </html>

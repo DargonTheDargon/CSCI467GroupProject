@@ -7,6 +7,9 @@ html {
     background-color: white;
 
     max-height: fit-content;
+    margin-top: 1.2em;
+    margin-bottom: 1.2em;
+    padding-bottom:10px;
     
     margin-left: auto;
     margin-right: auto;
@@ -16,6 +19,17 @@ html {
     
     box-shadow: 2px 4px 8px rgb(0 0 0 / 20%);
 
+}
+
+div.contact_info {
+    padding-top: 10px;
+    width:90%;
+    margin-left:auto;
+    margin-right:auto;    
+}
+
+div.contact_info h3 {
+    margin-top: 0;
 }
 
 div.line-item-list {
@@ -61,8 +75,9 @@ p.label {
 }
 
 p.amount {
-    margin-block-end: 0em;
-    margin-block-start: 0em;
+    margin-block-end: 0.1em;
+    margin-block-start: 0.1em;
+    text-align: right;
 }
 
 .price {
@@ -75,6 +90,22 @@ p.amount {
     width: 90%;
     margin-left:auto;
     margin-right:auto;   
+}
+
+.totals {
+    width: 90%;
+    margin-left:auto;
+    margin-right:auto;   
+    justify-content: right;
+    display: grid;     
+}
+
+.finalize {
+    width: 90%;
+    margin-left:auto;
+    margin-right:auto;   
+    justify-content: right;
+    display: grid;   
 }
 
 .quantity {
@@ -119,6 +150,8 @@ p.amount {
     border: none;
     position-anchor: --add-line-item;
 
+    box-shadow: 2px 4px 8px rgb(0 0 0 / 20%);
+
 }
 
 #add-note-menu {
@@ -131,6 +164,8 @@ p.amount {
     max-width: fit-content;
     border: none;
     position-anchor: --add-note;
+
+    box-shadow: 2px 4px 8px rgb(0 0 0 / 20%);
 }
 
 #add-note {
@@ -148,6 +183,19 @@ p.amount {
     border-radius: 5px;
     color: white;
     font-weight: bold;
+}
+
+button {
+    border:none;
+    padding: .5em;
+    background-color: #ff9800;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;    
+}
+
+button:hover {
+    background-color: #e68a00;
 }
 
 .add-button:hover {

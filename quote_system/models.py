@@ -63,14 +63,18 @@ class Quote(models.Model):
             return (base_amount * (self.discount_amount/Decimal(100))).quantize(Decimal('0.01'))
         return min(self.discount_amount,base_amount)
 
-    def total_price(self):
+    def subtotal_price(self):
         result =  self.line_items.aggregate(
             total_price = Sum(F('quantity')*F('price'),output_field=DecimalField(max_digits=10,decimal_places=2))
         )
-        total_cost = result['total_price'] or 0
-        if total_cost != 0:
-            total_cost -= self.calculate_discount(Decimal(total_cost))
+        total_cost = (result['total_price'] or 0).quantize(Decimal('0.01'))
         return total_cost
+
+    def total_price(self):
+        subtotal = self.subtotal_price()
+        if subtotal != 0:
+            total_price = subtotal - self.calculate_discount(Decimal(subtotal))
+        return total_price
     
     def __str__(self):
         return f"Quote #{self.pk} for {self.customer}"

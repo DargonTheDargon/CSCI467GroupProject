@@ -81,37 +81,53 @@ class QuoteView(DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        quote = self.object
         line_item_form = LineItemForm(request.POST)
         note_form = NoteForm(request.POST)
-        discount_form = DiscountForm(request.POST, instance=self.object)
+        discount_form = DiscountForm(request.POST, instance=quote)
         line_item_id = request.POST.get('delete_line_item')
+        finalize = request.POST.get('finalize')
 
         if line_item_id:
-            line_item = get_object_or_404(self.object.line_items,pk=line_item_id)
+            line_item = get_object_or_404(quote.line_items,pk=line_item_id)
             line_item.delete()
-            return redirect('quote_view', pk=self.object.pk)
+            return redirect('quote_view', pk=quote.pk)
 
         if 'add_line_item' in request.POST:
             if line_item_form.is_valid():
                 line_item = line_item_form.save(commit=False)
-                line_item.quote = self.object
+                line_item.quote = quote
                 line_item.save()
-                return redirect('quote_view', pk=self.object.pk)
+                return redirect('quote_view', pk=quote.pk)
             return self.render_to_response(self.get_context_data(line_item=line_item))
     
         elif 'add_note' in request.POST:
             if note_form.is_valid():
                 note = note_form.save(commit=False)
-                note.quote = self.object
+                note.quote = quote
                 note.save()
-                return redirect('quote_view', pk=self.object.pk)
+                return redirect('quote_view', pk=quote.pk)
             return self.render_to_response(self.get_context_data(note_form=note_form))
 
         elif 'add_discount' in request.POST:
             if discount_form.is_valid():
                 discount_form.save()
-                return redirect('quote_view', pk=self.object.pk)
+                return redirect('quote_view', pk=quote.pk)
             return self.render_to_response(self.get_context_data(discount_form=discount_form))
+
+        elif 'finalize' in request.POST:
+            if (quote.status == 'draft'):
+                quote.status = 'finalized'
+                quote.final_price = quote.total_price()
+                quote.save()
+                return redirect('quote_view', pk=quote.pk)
+            
+        elif 'unfinalize' in request.POST:
+            if (quote.status == 'finalized'):
+                quote.status = 'draft'
+                quote.save()
+                return redirect('quote_view', pk=quote.pk)
+
 
 
         
