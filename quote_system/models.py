@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -56,11 +58,18 @@ class Quote(models.Model):
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     final_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
+    def calculate_discount(self,base_amount: Decimal) -> Decimal:
+        if self.discount_type == self.DiscountType.PERCENT:
+            return (base_amount * (self.discount_amount/Decimal(100))).quantize(Decimal('0.01'))
+        return min(self.discount_amount,base_amount)
+
     def total_price(self):
         result =  self.line_items.aggregate(
             total_price = Sum(F('quantity')*F('price'),output_field=DecimalField(max_digits=10,decimal_places=2))
         )
         total_cost = result['total_price'] or 0
+        if total_cost != 0:
+            total_cost -= self.calculate_discount(Decimal(total_cost))
         return total_cost
     
     def __str__(self):

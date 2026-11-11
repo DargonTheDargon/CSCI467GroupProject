@@ -19,26 +19,40 @@ html {
 }
 
 div.line-item-list {
-    border: 1px solid black;
-    border-radius: 5px;
-}
-
-li {
-    border: 1px solid black;
-    list-style-type: none;
-    padding-left: 5px;
-    padding-top: 5px;   
-    
-}
-
- ul {
-    background-color: rgb(236, 236, 236);
-    padding-inline-start: 0;
-    margin-block-start: 0;
+    border-radius: 10px;
     width:90%;
     margin-left:auto;
     margin-right:auto;
+}
+
+div.notes {
+    width:90%;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+
+ul {
+    border: 1px solid black;
+    border-radius: 10px; 
+    background-color: rgb(236, 236, 236);
+    padding-inline-start: 0;
+    margin-block-start: 0;
     
+}
+
+li {
+    list-style-type: none;
+    padding-left: 5px;
+    padding-top: 5px;  
+    border-style: solid;
+    border-color: black;
+    border-width: 0 0 2px 0;
+    
+}
+
+li:last-child {
+    border-bottom:none;
 }
 
 p.label {
@@ -55,6 +69,12 @@ p.amount {
     display:inline-grid;
     grid-auto-flow: column;
     justify-content: right;
+}
+
+.discount {
+    width: 90%;
+    margin-left:auto;
+    margin-right:auto;   
 }
 
 .quantity {
@@ -86,6 +106,52 @@ p.amount {
 
 .delete {
     padding-right: 5px;
+}
+
+#dropdown-menu {
+    position:absolute;
+    margin: 0;
+    inset: auto;
+    top: anchor(bottom);
+    left: anchor(left);
+    margin-block-start: 5px;
+    max-width: fit-content;
+    border: none;
+    position-anchor: --add-line-item;
+
+}
+
+#add-note-menu {
+    position:absolute;
+    margin: 0;
+    inset: auto;
+    top: anchor(bottom);
+    left: anchor(left);
+    margin-block-start: 5px;
+    max-width: fit-content;
+    border: none;
+    position-anchor: --add-note;
+}
+
+#add-note {
+    anchor-name: --add-note;
+}
+
+#add-line-item {
+    anchor-name: --add-line-item;
+}
+
+.add-button {
+    border:none;
+    padding: 1em;
+    background-color: #ff9800;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+}
+
+.add-button:hover {
+    background-color: #c27400;
 }
 
 @media(max-width: 450px) {

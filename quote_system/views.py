@@ -3,10 +3,11 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView
 
+from .forms import DiscountForm, LineItemForm, NoteForm
 from .models import Quote
 
 
@@ -69,7 +70,51 @@ class QuoteView(DetailView):
     def get_queryset(self):
         quote_id=self.kwargs.get('pk')
         return Quote.objects.filter(pk=quote_id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.setdefault('line_item_form',LineItemForm())
+        context.setdefault('note_form',NoteForm())
+        context.setdefault('discount_form',DiscountForm())
+        context['discount_type'] = Quote.DiscountType.choices
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        line_item_form = LineItemForm(request.POST)
+        note_form = NoteForm(request.POST)
+        discount_form = DiscountForm(request.POST, instance=self.object)
+        line_item_id = request.POST.get('delete_line_item')
+
+        if line_item_id:
+            line_item = get_object_or_404(self.object.line_items,pk=line_item_id)
+            line_item.delete()
+            return redirect('quote_view', pk=self.object.pk)
+
+        if 'add_line_item' in request.POST:
+            if line_item_form.is_valid():
+                line_item = line_item_form.save(commit=False)
+                line_item.quote = self.object
+                line_item.save()
+                return redirect('quote_view', pk=self.object.pk)
+            return self.render_to_response(self.get_context_data(line_item=line_item))
     
+        elif 'add_note' in request.POST:
+            if note_form.is_valid():
+                note = note_form.save(commit=False)
+                note.quote = self.object
+                note.save()
+                return redirect('quote_view', pk=self.object.pk)
+            return self.render_to_response(self.get_context_data(note_form=note_form))
+
+        elif 'add_discount' in request.POST:
+            if discount_form.is_valid():
+                discount_form.save()
+                return redirect('quote_view', pk=self.object.pk)
+            return self.render_to_response(self.get_context_data(discount_form=discount_form))
+
+
+        
 
 
     

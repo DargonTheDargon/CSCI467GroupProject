@@ -27,7 +27,7 @@
                                     <p class="amount"> {{ line_item.quantity}} </p>
                                 </div>
                                 <div class="unit_price">
-                                    <p class="label"> Unite Price</p>
+                                    <p class="label"> Unit Price</p>
                                     <p class="amount">${{line_item.price}}<p>
                                 </div>
                                 <div class="total_price">
@@ -35,16 +35,55 @@
                                     <p class="amount">${{line_item.total_price}}<p>
                                 </div>
                                 <div class="delete">
-                                    <p>🗑️<p>
+                                    <form method="POST">
+                                        {% csrf_token %}
+                                        <button class="delete" type="submit" name="delete_line_item" value="{{line_item.id}}">
+                                            🗑️
+                                        </button>
+                                    </form>
                                 </div>
                             </div>  
                         </div>
                     </li>
                     {% endfor %}
                 </ul>
+                <button type="button" id="add-line-item" class="add-button" aria-label="Add Line Item" popovertarget="dropdown-menu">Add Line Item </button>
+                <div id="dropdown-menu" popover="auto" class="menu">
+                    <form method="POST">
+                    {% csrf_token %}
+                    {{ line_item_form.as_p}}
+                    <button type="submit" name="add_line_item">Add</button>
+                    </form>
+                </div>
+            </div>
+            <div class="notes">
+             <p>Notes</p>
+                <div class="notes-list">
+                    <ul class="notes-list">
+                        {% for note in quote.notes.all%}
+                        <li> {{note.text}} </li>
+                        {%endfor%}
+                    </ul>
+                </div>
+                <button type="button" id="add-note" class="add-button" aria-label="Add Note" popovertarget="add-note-menu">Add Note</button>
+                <div id="add-note-menu" popover="auto" class="menu">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ note_form.as_p }}
+                        <button type="submit" name="add_note">Add</button>
+                    </form>
+                </div>
+            </div>
+            <div class="discount">
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ discount_form.as_p }}
+                    <button type="submit" name="add_discount">Apply Discount</button>
+                </form>
             </div>
             <p>{{quote.total_price}}</p>
-        </div>  
+
+        </div>
     </body> 
 </html>
     {% endblock%}
