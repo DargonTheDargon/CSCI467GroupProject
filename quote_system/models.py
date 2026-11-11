@@ -67,13 +67,20 @@ class Quote(models.Model):
         result =  self.line_items.aggregate(
             total_price = Sum(F('quantity')*F('price'),output_field=DecimalField(max_digits=10,decimal_places=2))
         )
-        total_cost = (result['total_price'] or 0).quantize(Decimal('0.01'))
-        return total_cost
+        subtotal_cost = result['total_price'] or 0
+        if (subtotal_cost != 0):
+            subtotal_cost = subtotal_cost.quantize(Decimal('0.01'))
+            return subtotal_cost
+        subtotal_cost = Decimal('0.00')
+        return subtotal_cost
 
     def total_price(self):
         subtotal = self.subtotal_price()
         if subtotal != 0:
             total_price = subtotal - self.calculate_discount(Decimal(subtotal))
+            total_price = max(total_price, 0)
+            return total_price
+        total_price = Decimal('0.00')
         return total_price
     
     def __str__(self):

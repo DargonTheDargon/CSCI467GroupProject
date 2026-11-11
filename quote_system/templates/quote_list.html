@@ -35,7 +35,11 @@
                         <a href = "{% url 'quote_view' quote.pk %}">
                         Quote for {{quote.customer}} by {{quote.sales_associate.user.first_name}} 
                         {{quote.sales_associate.user.last_name}}</a> </br>
+                        {% if quote.status == 'draft' %}
+                        <p> <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="lightblue"/></svg> {{quote.status}} </p>
+                        {% elif quote.status == 'finalized' %}
                         <p> <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="green"/></svg> {{quote.status}} </p>
+                        {% endif %}
                     </li>
                 {% endfor %}
             </ul>
