@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block content %}
 <html>
     <head>
         {% block quotecss %}
@@ -9,7 +8,14 @@
         {% endblock%}
         <title>{% block title %}Quote List{% endblock %}</title>
     </head>
-
+    {% block topbar_buttons %}
+    <header class="topbar" id="buttons">
+        <div class="topbar-actions">
+              <a class="exit" href="{% url 'quote_list' %}">✖</a>
+        </div>
+    </header>
+    {% endblock %}    
+    {% block content %}
     <body>
         <div class="frame">
             <div class="contact_info">

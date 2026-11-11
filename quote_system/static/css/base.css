@@ -7,6 +7,11 @@ body {
     font-family: Arial, sans-serif;
 }
 
+a.exit {
+        color: #fff;
+    font-size: 1.5rem;
+}
+
 .topbar {
     position: relative;
     min-height: 4rem;
