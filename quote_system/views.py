@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView
 
 from .forms import DiscountForm, LineItemForm, NoteForm
-from .models import Quote
+from .models import Quote, SalesAssociate
 
 
 @require_POST
@@ -45,7 +45,8 @@ def purchase_orders(request):
 
 @login_required
 def associates(request):
-    return render(request, 'associates.html')
+    sales_associates = SalesAssociate.objects.select_related('user').order_by('user__username')
+    return render(request, 'associates.html', {'sales_associates': sales_associates})
 
 class QuoteListView(ListView):
     template_name = 'quote_list.html'
