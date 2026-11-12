@@ -7,14 +7,24 @@ body {
     font-family: Arial, sans-serif;
 }
 
+a.exit {
+        color: #fff;
+    font-size: 1.5rem;
+}
+
 .topbar {
     position: relative;
     min-height: 4rem;
-    padding: 0.5rem 1rem;
+    padding: 0rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: #ff9800;
+}
+
+#buttons.topbar {
+    display: flex;
+    justify-content: right;
 }
 
 .nav-menu {
@@ -84,7 +94,7 @@ body {
 
 .topbar-actions {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: stretch;
 }
 
@@ -98,6 +108,7 @@ body {
     color: #fff;
     font-size: 1rem;
     cursor: pointer;
+    anchor-name: --sort-button;
 }
 
 .topbar-actions button:hover {
@@ -118,6 +129,29 @@ body {
 .topbar .topbar-actions .sort-button:hover {
     color: #000;
     background-color: #fff;
+}
+
+#dropdown-menu {
+    position:absolute;
+    margin: 0;
+    inset: auto;
+    top: anchor(bottom);
+    right: anchor(right);
+    margin-block-start: 5px;
+    max-width: fit-content;
+    border: none;
+
+    position-anchor: --sort-button;
+}
+
+#dropdown-menu:popover-open {
+    display: grid;
+}
+
+[role="menu"] {
+    list-style-type: none;
+    padding: 0; /* Removes default indentation */
+    margin: 0;  /* Removes default spacing */
 }
 
 #search-bar {

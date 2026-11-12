@@ -1,5 +1,9 @@
+from decimal import Decimal
+
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import DecimalField, F, Sum
 from django.utils import timezone
 
 
@@ -54,8 +58,33 @@ class Quote(models.Model):
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     final_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
+    def calculate_discount(self,base_amount: Decimal) -> Decimal:
+        if self.discount_type == self.DiscountType.PERCENT:
+            return (base_amount * (self.discount_amount/Decimal(100))).quantize(Decimal('0.01'))
+        return min(self.discount_amount,base_amount)
+
+    def subtotal_price(self):
+        result =  self.line_items.aggregate(
+            total_price = Sum(F('quantity')*F('price'),output_field=DecimalField(max_digits=10,decimal_places=2))
+        )
+        subtotal_cost = result['total_price'] or 0
+        if (subtotal_cost != 0):
+            subtotal_cost = subtotal_cost.quantize(Decimal('0.01'))
+            return subtotal_cost
+        subtotal_cost = Decimal('0.00')
+        return subtotal_cost
+
+    def total_price(self):
+        subtotal = self.subtotal_price()
+        if subtotal != 0:
+            total_price = subtotal - self.calculate_discount(Decimal(subtotal))
+            total_price = max(total_price, 0)
+            return total_price
+        total_price = Decimal('0.00')
+        return total_price
+    
     def __str__(self):
-        return f"Quote #{self}"
+        return f"Quote #{self.pk} for {self.customer}"
 
 
 class PurchaseOrder(models.Model):
@@ -70,7 +99,7 @@ class PurchaseOrder(models.Model):
     commission_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
-        return f"PO #{self}"
+        return f"PO #{self.pk}"
 
 
 class LineItem(models.Model):
@@ -79,7 +108,18 @@ class LineItem(models.Model):
     )
     description = models.CharField(max_length=200)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    quantity = models.IntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(100)
+        ],
+        default=0
+    )
 
+    @property
+    def total_price(self):
+        return self.price * self.quantity
+    
     def __str__(self):
         return self.description
 

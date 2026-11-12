@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block quotecss %}{% endblock %}
     <title>{% block title %}Quick Quotes{% endblock %}</title>
 </head>
 <body>
@@ -22,17 +23,9 @@
                 </form>
             </nav>
         </details>
-
-        <div class="topbar-actions">
-            <button type="button" id="search-toggle" aria-label="Open search">Search</button>
-            <button type="button" class="sort-button" aria-label="Sort">Sort</button>
-        </div>
+        {% block topbar_buttons %}
+        {% endblock %}
     </header>
-
-    <form id="search-bar" hidden role="search">
-        <label for="search-input">Search</label>
-        <input id="search-input" type="search">
-    </form>
 
     <main>
         {% block content %}{% endblock %}
