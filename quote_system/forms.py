@@ -12,6 +12,7 @@ class NoteForm(forms.ModelForm):
     class Meta:
         model = Note
         fields = ['text']
+        error_messages = {'text': {'required': 'Please Fill Out This Field.'}}
 
 class DiscountForm(forms.ModelForm):
     class Meta:

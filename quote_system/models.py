@@ -113,7 +113,7 @@ class LineItem(models.Model):
             MinValueValidator(1),
             MaxValueValidator(100)
         ],
-        default=0
+        default=1
     )
 
     @property
