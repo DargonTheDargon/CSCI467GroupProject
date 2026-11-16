@@ -11,12 +11,16 @@
         <title>{% block title %}Quote List{% endblock %}</title>
     </head>
     {% block topbar_buttons %}
-    <header class="topbar" id="buttons">
         <div class="topbar-actions">
-            <button type="button" id="search-toggle" aria-label="Open search">Search</button>
+            <form class="topbar-actions" method="GET">
+                {% csrf_token %}
+                <input class="search-bar" type="text" name="search" placeholder="Lookup by sales associate, customer, status">
+                <button type="submit" id="search-toggle" aria-label="Open search">Search</button>
+            </form>
+        </div>
+        <div>
             <button type="button" class="sort-button" aria-label="Sort" popovertarget="dropdown-menu">Sort</button>
         </div>
-    </header>
     {% endblock %}
     
     <body>
@@ -39,10 +43,36 @@
                         <p> <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="lightblue"/></svg> {{quote.status}} </p>
                         {% elif quote.status == 'finalized' %}
                         <p> <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="green"/></svg> {{quote.status}} </p>
+                        {% elif quote.status == 'sanctioned' %}
+                        <p> <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="red"/></svg> {{quote.status}} </p>
+                        {% elif quote.status == 'ordered' %}
+                        <p> <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="yellow"/></svg> {{quote.status}} </p>
                         {% endif %}
                     </li>
                 {% endfor %}
             </ul>
+            <button class="create-quote" popovertarget="add-quote">+</button>
+            <div class="create-quote" id="add-quote" popover="auto">
+                <form method="POST">
+                    {% csrf_token %}
+                    <label for="select-customer">Select customer</label>
+                    <select name="customer" id="select-customer">
+                        <option value="">Choose customer</option>
+                        {% for customer in customers %}
+                        <option value="{{customer.id}}"> {{ customer.name }}{{customer.id}} </option>
+                        {% endfor %}
+                    </select> </br>
+                    {% csrf_token %}
+                    <label for="sales-associate-select">Sales Associate</label>
+                    <select name="sales-associate" id="sales-associate-select">
+                        <option value="">Choose sales associate</option>
+                        {% for sales_associate in sales_associates %}
+                        <option value="{{sales_associate.user.id}}">{{sales_associate.user.first_name}} {{sales_associate.user.last_name}}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" name="add_quote"> Start Quote </button>
+                </form>
+            </div>
         {% endblock %}
     </body>
     </html>
