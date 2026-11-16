@@ -2,45 +2,111 @@
 {% load static %}
 
 {% block title %}Sanction Interface{% endblock %}
+{% block html_class %}sanction-interface-page{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/sanction_interface.css' %}">
+<link rel="stylesheet" href="{% static 'css/sanction_interface.css' %}?v=19">
 
 <div class="sanction-container">
     <h1>Sanction Interface</h1>
 
-    <div class="sanction-table-wrapper">
-        {% if show_no_quote_error %}
-        <p id="sanction-error" class="sanction-error" role="alert">
-            Error: No Quote Selected
-        </p>
+    {% if show_no_quote_error %}
+    <p id="sanction-error" class="sanction-error" role="alert">
+        Error: No Quote Selected
+    </p>
+    {% endif %}
+    <form method="post" class="sanction-interface-form">
+        {% csrf_token %}
+        {% if selected_quote_ids %}
+        <input type="hidden" name="selected_quote_id" value="{{ selected_quote_ids.0 }}">
         {% endif %}
+        <div class="sanction-options">
+            <button type="submit" name="action" value="edit">Edit</button>
+            <button type="submit" name="action" value="apply_discount">Apply Discount</button>
+            <button type="submit" name="action" value="secret_notes">Secret Note(s)</button>
+            <button type="submit" name="action" value="sanction">Sanction</button>
+        </div>
+    </form>
+    <div class="sanction-table-wrapper">
         <table>
-            <colgroup>
-                <col class="sanction-quotes-column">
-                <col class="sanction-options-column">
-            </colgroup>
             <thead>
                 <tr>
                     <th scope="col">Quotes</th>
-                    <th scope="col">Options</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td></td>
-                    <td class="sanction-options-cell">
-                        <form method="post" class="sanction-options">
+                    <td class="sanction-quotes-cell">
+                        <div class="sanction-quotes-list">
+                        {% for quote in quotes %}
+                        <form id="quote-{{ quote.pk }}" method="post" class="sanction-quote-form">
                             {% csrf_token %}
-                            <button type="submit" name="action" value="edit">Edit</button>
-                            <button type="submit" name="action" value="apply_discount">Apply Discount</button>
-                            <button type="submit" name="action" value="secret_notes">Secret Note(s)</button>
-                            <button type="submit" name="action" value="sanction">Sanction</button>
+                            <input type="hidden" name="action" value="toggle_quote">
+                            <input type="hidden" name="quote_id" value="{{ quote.pk }}">
+                            <button type="submit" class="sanction-quote" aria-pressed="{% if quote.pk in selected_quote_ids %}true{% else %}false{% endif %}">
+                                <span class="sanction-quote-bubble" aria-hidden="true"></span>
+                                <span class="sanction-visually-hidden">Select or unselect quote #{{ quote.pk }}</span>
+                                <span class="sanction-quote-title">Quote #{{ quote.pk }}: {{ quote.customer.name }}</span>
+                                <span>Status: {{ quote.get_status_display }}</span>
+                                <span>Line Item(s): {{ quote.line_item_count }}</span>
+                                <span>Final Price: ${{ quote.final_price|floatformat:2 }}</span>
+                            </button>
                         </form>
+                        {% empty %}
+                        <p class="sanction-no-quotes">No quotes found.</p>
+                        {% endfor %}
+                        </div>
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
+    {% if show_sanction_confirmation %}
+    <div class="sanction-modal-backdrop">
+        <form method="post">
+            {% csrf_token %}
+            <section class="sanction-modal" role="dialog" aria-modal="true" aria-labelledby="sanction-modal-title">
+                <h2 id="sanction-modal-title">Are you sure you want to Sanction this quote?</h2>
+                <div class="sanction-modal-actions">
+                    <button type="submit" name="action" value="confirm_sanction">Yes</button>
+                    <button type="submit" name="action" value="cancel_sanction">No</button>
+                </div>
+            </section>
+        </form>
+    </div>
+    {% endif %}
+    {% if show_secret_notes %}
+    <div class="sanction-modal-backdrop">
+        <form method="post" class="sanction-modal-backdrop-close-form">
+            {% csrf_token %}
+            <button type="submit" name="action" value="close_secret_notes" aria-label="Close secret notes dialog"></button>
+        </form>
+        <form method="post" class="sanction-modal-form">
+            {% csrf_token %}
+            <section class="sanction-modal" role="dialog" aria-modal="true" aria-labelledby="secret-notes-modal-title">
+                <h2 id="secret-notes-modal-title">Secret Note(s)</h2>
+                <div class="sanction-modal-actions">
+                    <button type="button">View</button>
+                    <button type="button">Add</button>
+                </div>
+            </section>
+        </form>
+    </div>
+    {% endif %}
+    {% if show_apply_discount %}
+    <div class="sanction-modal-backdrop">
+        <form method="post" class="sanction-modal-backdrop-close-form">
+            {% csrf_token %}
+            <button type="submit" name="action" value="close_apply_discount" aria-label="Close apply discount dialog"></button>
+        </form>
+        <section class="sanction-modal" role="dialog" aria-modal="true" aria-labelledby="apply-discount-modal-title">
+            <h2 id="apply-discount-modal-title">Apply Discount</h2>
+            <div class="sanction-modal-actions">
+                <button type="button">Percent</button>
+                <button type="button">Amount</button>
+            </div>
+        </section>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

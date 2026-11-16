@@ -55,7 +55,7 @@ class Quote(models.Model):
     final_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
-        return f"Quote #{self}"
+        return f"Quote #{self.pk}"
 
 
 class PurchaseOrder(models.Model):
