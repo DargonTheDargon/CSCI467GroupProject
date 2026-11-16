@@ -87,8 +87,8 @@ class QuoteListView(ListView):
                 | Q(customer__name__icontains=search)
                 | Q(status__icontains=search)
             )
-            if (self.request.user.role == User.Role.SALES_ASSOCIATE):
-                queryset = queryset.filter(sales_associate__user=self.request.user)
+        if (self.request.user.role == User.Role.SALES_ASSOCIATE):
+            queryset = queryset.filter(sales_associate__user=self.request.user)
         return queryset
 
     def get_context_data(self, **kwargs):
