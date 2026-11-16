@@ -1,7 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User, SalesAssociate
+from .models import Customer, LineItem, Note, Quote, SalesAssociate, User
 
 admin.site.register(User, UserAdmin)
+admin.site.register(Quote)
+admin.site.register(Customer)
 admin.site.register(SalesAssociate)
+admin.site.register(LineItem)
+admin.site.register(Note)

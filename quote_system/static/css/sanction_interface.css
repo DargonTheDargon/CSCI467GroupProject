@@ -140,6 +140,86 @@
     background-color: #e68a00;
 }
 
+.sanction-note-list {
+    max-height: 50vh;
+    overflow-y: auto;
+    margin: 0 0 16px;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+}
+
+.sanction-note-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.sanction-note-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+}
+
+.sanction-note-close-form {
+    margin: 0;
+}
+
+.sanction-note-delete-button {
+    flex: 0 0 auto;
+    padding: 0 4px;
+    border: 0;
+    background: transparent;
+    color: #d00000;
+    cursor: pointer;
+    font: bold 1rem Arial, sans-serif;
+}
+
+.sanction-note-delete-button:hover {
+    color: #a00000;
+}
+
+.sanction-note-item-text {
+    flex: 1;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.sanction-note-confirmation-text {
+    max-height: 30vh;
+    overflow-y: auto;
+    margin: 0 0 20px;
+    overflow-wrap: anywhere;
+    text-align: left;
+    white-space: pre-wrap;
+}
+
+.sanction-note-empty {
+    margin: 0 0 16px;
+}
+
+.sanction-note-form {
+    text-align: left;
+}
+
+.sanction-note-form label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.sanction-note-form textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 8px;
+    font: inherit;
+}
+
+.sanction-note-form .errorlist {
+    margin: 0 0 8px;
+    color: #d00000;
+    animation: sanction-error-timeout 3s forwards;
+}
+
 .sanction-quotes-list {
     max-height: 240px;
     overflow-y: auto;
@@ -149,6 +229,7 @@
 
 .sanction-quote-form {
     margin: 0;
+    scroll-margin-top: 48px;
 }
 
 .sanction-quote {

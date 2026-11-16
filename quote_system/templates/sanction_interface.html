@@ -4,8 +4,25 @@
 {% block title %}Sanction Interface{% endblock %}
 {% block html_class %}sanction-interface-page{% endblock %}
 
+{% block topbar_buttons %}
+<div class="topbar-actions">
+    <button type="button" id="search-toggle" aria-label="Open search">Search</button>
+    <button type="button" class="sort-button" aria-label="Sort" popovertarget="dropdown-menu">Sort</button>
+</div>
+{% endblock %}
+
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/sanction_interface.css' %}?v=19">
+<link rel="stylesheet" href="{% static 'css/sanction_interface.css' %}?v=24">
+
+<div id="dropdown-menu" popover="auto" class="side-menu">
+    <ul role="menu">
+        <li role="menuitem"><a href="{% querystring sort="status" %}">Status Ascending</a></li>
+        <li role="menuitem"><a href="{% querystring sort="-status" %}">Status Descending</a></li>
+        <li role="menuitem"><a href="{% querystring sort="id" %}">ID Ascending</a></li>
+        <li role="menuitem"><a href="{% querystring sort="-id" %}">ID Descending</a></li>
+        <li role="menuitem"><a href="{% url 'sanction_interface' %}">Reset</a></li>
+    </ul>
+</div>
 
 <div class="sanction-container">
     <h1>Sanction Interface</h1>
@@ -39,7 +56,7 @@
                     <td class="sanction-quotes-cell">
                         <div class="sanction-quotes-list">
                         {% for quote in quotes %}
-                        <form id="quote-{{ quote.pk }}" method="post" class="sanction-quote-form">
+                        <form id="quote-{{ quote.pk }}" method="post" action="{{ sanction_interface_url }}" class="sanction-quote-form">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="toggle_quote">
                             <input type="hidden" name="quote_id" value="{{ quote.pk }}">
@@ -75,6 +92,24 @@
         </form>
     </div>
     {% endif %}
+    {% if show_edit_confirmation %}
+    <div class="sanction-modal-backdrop">
+        <form method="post" class="sanction-modal-backdrop-close-form">
+            {% csrf_token %}
+            <button type="submit" name="action" value="close_edit_confirmation" aria-label="Close edit confirmation"></button>
+        </form>
+        <form method="post" class="sanction-modal-form">
+            {% csrf_token %}
+            <section class="sanction-modal" role="dialog" aria-modal="true" aria-labelledby="edit-confirmation-modal-title">
+                <h2 id="edit-confirmation-modal-title">Edit the selected quote?</h2>
+                <div class="sanction-modal-actions">
+                    <button type="submit" name="action" value="confirm_edit">Yes</button>
+                    <button type="submit" name="action" value="cancel_edit">No</button>
+                </div>
+            </section>
+        </form>
+    </div>
+    {% endif %}
     {% if show_secret_notes %}
     <div class="sanction-modal-backdrop">
         <form method="post" class="sanction-modal-backdrop-close-form">
@@ -86,8 +121,83 @@
             <section class="sanction-modal" role="dialog" aria-modal="true" aria-labelledby="secret-notes-modal-title">
                 <h2 id="secret-notes-modal-title">Secret Note(s)</h2>
                 <div class="sanction-modal-actions">
-                    <button type="button">View</button>
-                    <button type="button">Add</button>
+                    <button type="submit" name="action" value="view_secret_notes">View</button>
+                    <button type="submit" name="action" value="add_secret_note">Add</button>
+                </div>
+            </section>
+        </form>
+    </div>
+    {% endif %}
+    {% if show_secret_notes_view %}
+    <div class="sanction-modal-backdrop">
+        <form method="post" class="sanction-modal-backdrop-close-form">
+            {% csrf_token %}
+            <button type="submit" name="action" value="close_secret_notes" aria-label="Close secret notes dialog"></button>
+        </form>
+        <section class="sanction-modal sanction-modal-form" role="dialog" aria-modal="true" aria-labelledby="secret-notes-view-title">
+            <h2 id="secret-notes-view-title">Secret Note(s) for Quote #{{ selected_quote.pk }}</h2>
+            {% if secret_notes %}
+            <ul class="sanction-note-list">
+                {% for note in secret_notes %}
+                <li>
+                    <form method="post" class="sanction-note-item">
+                        {% csrf_token %}
+                        <input type="hidden" name="note_id" value="{{ note.pk }}">
+                        <button type="submit" name="action" value="delete_secret_note" class="sanction-note-delete-button" aria-label="Delete note">X</button>
+                        <span class="sanction-note-item-text">{{ note.text }}</span>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="sanction-note-empty">No notes have been added to this quote.</p>
+            {% endif %}
+            <form method="post" class="sanction-note-close-form">
+                {% csrf_token %}
+                <div class="sanction-modal-actions">
+                    <button type="submit" name="action" value="close_secret_notes">Close</button>
+                </div>
+            </form>
+        </section>
+    </div>
+    {% endif %}
+    {% if show_delete_secret_note_confirmation %}
+    <div class="sanction-modal-backdrop">
+        <form method="post" class="sanction-modal-backdrop-close-form">
+            {% csrf_token %}
+            <input type="hidden" name="note_id" value="{{ pending_note.pk }}">
+            <button type="submit" name="action" value="keep_secret_note" aria-label="Keep note and close confirmation"></button>
+        </form>
+        <form method="post" class="sanction-modal-form">
+            {% csrf_token %}
+            <input type="hidden" name="note_id" value="{{ pending_note.pk }}">
+            <section class="sanction-modal" role="dialog" aria-modal="true" aria-labelledby="delete-secret-note-title">
+                <h2 id="delete-secret-note-title">Are you sure you want to delete this note?</h2>
+                <p class="sanction-note-confirmation-text">{{ pending_note.text }}</p>
+                <div class="sanction-modal-actions">
+                    <button type="submit" name="action" value="confirm_delete_secret_note">Delete</button>
+                    <button type="submit" name="action" value="keep_secret_note">Keep</button>
+                </div>
+            </section>
+        </form>
+    </div>
+    {% endif %}
+    {% if show_add_secret_note %}
+    <div class="sanction-modal-backdrop">
+        <form method="post" class="sanction-modal-backdrop-close-form">
+            {% csrf_token %}
+            <button type="submit" name="action" value="close_secret_notes" aria-label="Close add note dialog"></button>
+        </form>
+        <form method="post" class="sanction-modal-form sanction-note-form" novalidate>
+            {% csrf_token %}
+            <section class="sanction-modal" role="dialog" aria-modal="true" aria-labelledby="add-secret-note-title">
+                <h2 id="add-secret-note-title">Adding Note For:<br>Quote #{{ selected_quote.pk }}: {{ selected_quote.customer.name }}</h2>
+                <div role="alert">{{ secret_note_form.text.errors }}</div>
+                <label for="{{ secret_note_form.text.id_for_label }}">Note</label>
+                {{ secret_note_form.text }}
+                <div class="sanction-modal-actions">
+                    <button type="submit" name="action" value="save_secret_note">Add Note</button>
+                    <button type="submit" name="action" value="close_secret_notes">Cancel</button>
                 </div>
             </section>
         </form>
