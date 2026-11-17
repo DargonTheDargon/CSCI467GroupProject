@@ -96,7 +96,9 @@ a.exit {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     gap: 4px;
+    flex: 1;
 }
 
 .topbar-actions button {
@@ -109,14 +111,14 @@ a.exit {
     color: #fff;
     font-size: 1rem;
     cursor: pointer;
-    anchor-name: --sort-button;
 }
 
 .topbar-actions button:hover {
     background-color: #e68a00;
 }
 
-.topbar .topbar-actions .sort-button {
+.sort-button {
+    anchor-name: --sort-button;
     width: 4.5rem;
     height: 2.5rem;
     min-width: 0;
@@ -124,7 +126,8 @@ a.exit {
     padding: 0;
     color: #000;
     background-color: #fff;
-    border-radius: 9999px;
+    border:none;
+    border-radius:9999px;
 }
 
 .topbar .topbar-actions .sort-button:hover {
@@ -155,8 +158,9 @@ a.exit {
     margin: 0;  /* Removes default spacing */
 }
 
-#search-bar {
-    padding: 1rem;
+.search-bar {
+    width: 70%;
+    max-width: 700px;
 }
 
 #search-bar input {

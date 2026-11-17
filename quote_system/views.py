@@ -3,14 +3,15 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
+from django.db.models import CharField, Count, Q, Value
+from django.db.models.functions import Concat
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView
 
 from .forms import DiscountForm, LineItemForm, NoteForm
-from .models import Note, Quote, SalesAssociate
+from .models import Customer, Quote, SalesAssociate, User
 
 
 @require_POST
@@ -31,7 +32,13 @@ def login_page(request):
 
 @login_required
 def quote_list(request):
-    return render(request, 'quote_list.html')
+    sales_associates = SalesAssociate.objects.all()
+    customers = Customer.objects.all()
+    context = {
+        'sales_associates':sales_associates,
+        'customers':customers
+    }
+    return render(request, 'quote_list.html',context)
 
 @login_required
 def quote_view(request):
@@ -157,7 +164,43 @@ class QuoteListView(ListView):
                 queryset = queryset.order_by("id")
             elif sort == "-id":
                 queryset = queryset.order_by("-id")
+
+        search = self.request.GET.get('search')
+        if search:
+            queryset = queryset.annotate(
+                sales_associate_name=Concat(
+                    'sales_associate__user__first_name',
+                    Value(' '),
+                    'sales_associate__user__last_name',
+                    output_field=CharField()
+                )
+            )
+            queryset = queryset.filter(
+                Q(sales_associate_name__icontains=search)
+                | Q(customer__name__icontains=search)
+                | Q(status__icontains=search)
+            )
+        if (self.request.user.role == User.Role.SALES_ASSOCIATE):
+            queryset = queryset.filter(sales_associate__user=self.request.user)
         return queryset
+
+    def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context['customers'] = Customer.objects.all()
+            context['sales_associates'] = SalesAssociate.objects.all()
+            return context
+
+    def post(self, request, *args, **kwargs):
+
+        if 'add_quote' in request.POST:
+            sales_associate_data = request.POST.get('sales-associate')
+            print(sales_associate_data)
+            customer_data = request.POST.get('customer')
+            quote = Quote(sales_associate_id = sales_associate_data, customer_id = customer_data)
+            quote.save()
+            
+        return redirect('quote_view', pk=quote.pk)
+        
 
 class QuoteView(DetailView):
     template_name = 'quote_view.html'
@@ -223,10 +266,3 @@ class QuoteView(DetailView):
                 quote.status = 'draft'
                 quote.save()
                 return redirect('quote_view', pk=quote.pk)
-
-
-
-        
-
-
-    
