@@ -266,10 +266,3 @@ class QuoteView(DetailView):
                 quote.status = 'draft'
                 quote.save()
                 return redirect('quote_view', pk=quote.pk)
-
-
-
-        
-
-
-    
