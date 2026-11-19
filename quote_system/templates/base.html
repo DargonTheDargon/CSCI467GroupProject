@@ -16,7 +16,9 @@
                 <a href="{% url 'quote_list' %}">Quote List</a>
                 <a href="{% url 'sanction_interface' %}">Sanction Interface</a>
                 <a href="{% url 'purchase_orders' %}">Purchase Orders</a>
-                <a href="{% url 'associates' %}">Associates</a>
+                {% if request.user.role == 'admin' %}
+                    <a href="{% url 'associates' %}">Associates</a>
+                {% endif %}
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="logout-link">Log Out</button>
