@@ -1,17 +1,22 @@
+from decimal import Decimal
+
+from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import CharField, Count, Q, Value
+from django.db.models import CharField, Count, F, Q, Value
 from django.db.models.functions import Concat
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
+from django.utils.formats import date_format
 from django.views.decorators.http import require_POST
 from django.db.models.functions import Lower
 from django.views.generic import DetailView, ListView
 from django.db import transaction
 
-from .forms import DiscountForm, EditAssociateForm, LineItemForm, NoteForm, AddAssociateForm
-from .models import Customer, Quote, SalesAssociate, User
+from .forms import DiscountForm, EditAssociateForm, LineItemForm, NoteForm, AddAssociateForm, PurchaseOrderForm
+from .models import Customer, PurchaseOrder, Quote, SalesAssociate, User
 
 
 @require_POST
@@ -141,8 +146,85 @@ def sanction_interface(request):
     return render(request, 'sanction_interface.html', {'show_no_quote_error': show_no_quote_error, 'show_edit_confirmation': show_edit_confirmation, 'show_sanction_confirmation': show_sanction_confirmation, 'show_secret_notes': show_secret_notes, 'show_secret_notes_view': show_secret_notes_view, 'show_add_secret_note': show_add_secret_note, 'show_delete_secret_note_confirmation': show_delete_secret_note_confirmation, 'pending_note': pending_note, 'secret_note_form': secret_note_form, 'selected_quote': selected_quote, 'secret_notes': secret_notes, 'show_apply_discount': show_apply_discount, 'quotes': quotes, 'selected_quote_ids': selected_quote_ids, 'sanction_interface_url': sanction_interface_url})
 
 @login_required
-def purchase_orders(request):
-    return render(request, 'purchase_orders.html')
+def purchase_orders(request): # lists sanctioned quotes that can be converted into purchase orders
+    sort_order = {
+        'id': 'pk',
+        '-id': '-pk',
+        'customer': Lower('customer__name'),
+        '-customer': Lower('customer__name').desc(),
+    }.get(request.GET.get('sort'), 'pk')
+    quotes = Quote.objects.filter(status=Quote.Status.SANCTIONED).select_related(
+        'customer'
+    ).annotate(line_item_count=Count('line_items')).order_by(sort_order)
+    return render(request, 'purchase_orders.html', {'quotes': quotes})
+
+@login_required
+def create_purchase_order(request, pk): # shows the selected quote and customer details for converting it into a purchase order
+    quote = get_object_or_404(
+        Quote.objects.select_related('customer', 'sales_associate__user'), pk=pk
+    )
+    purchase_order = PurchaseOrder.objects.filter(quote=quote).first()
+    subtotal = quote.subtotal_price()
+    quoted_price = quote.total_price()
+    context = {
+        'quote': quote,
+        'purchase_order': purchase_order,
+        'line_items': quote.line_items.all(),
+        'subtotal': subtotal,
+        'quote_discount_total': subtotal - quoted_price,
+        'quoted_price': quoted_price,
+    }
+    if purchase_order:
+        context['final_discount_total'] = quoted_price - purchase_order.final_price
+    elif quote.status == Quote.Status.SANCTIONED:
+        form = PurchaseOrderForm(request.POST or None)
+        if request.method == 'POST' and form.is_valid():
+            with transaction.atomic():
+                # Lock the quote so a double submit can't create two purchase orders
+                quote = Quote.objects.select_for_update().select_related(
+                    'customer', 'sales_associate'
+                ).get(pk=quote.pk)
+                if quote.status != Quote.Status.SANCTIONED or PurchaseOrder.objects.filter(quote=quote).exists():
+                    return redirect('create_purchase_order', pk=quote.pk)
+
+                purchase_order = form.save(commit=False)
+                purchase_order.quote = quote
+                purchase_order.final_price = max(
+                    quoted_price - final_discount(purchase_order, quoted_price), Decimal('0.00')
+                )
+
+                # Stand-in for the external processing system, which answers with
+                # a processing date and the associate's commission rate.
+                processing_date, commission_rate = process_purchase_order(purchase_order)
+                purchase_order.processing_date = processing_date
+                purchase_order.commission_amount = (
+                    purchase_order.final_price * commission_rate / Decimal(100)
+                ).quantize(Decimal('0.01'))
+                purchase_order.save()
+
+                SalesAssociate.objects.filter(pk=quote.sales_associate.pk).update(
+                    accumulated_commission=F('accumulated_commission') + purchase_order.commission_amount
+                )
+                quote.status = Quote.Status.ORDERED
+                quote.save(update_fields=['status'])
+
+            # TODO: send the purchase details email to the customer
+            messages.success(
+                request,
+                f"The order was placed on {date_format(timezone.localdate(processing_date), 'F j, Y')} "
+                f"and an email was sent to {quote.customer.email}.",
+            )
+            return redirect('create_purchase_order', pk=quote.pk)
+        context['form'] = form
+    return render(request, 'create_purchase_order.html', context)
+
+def final_discount(purchase_order, base_amount): # same rules as Quote.calculate_discount, applied to the final discount
+    if purchase_order.discount_type == Quote.DiscountType.PERCENT:
+        return (base_amount * purchase_order.discount_amount / Decimal(100)).quantize(Decimal('0.01'))
+    return min(purchase_order.discount_amount, base_amount)
+
+def process_purchase_order(purchase_order): # placeholder for the external processing system
+    return timezone.now(), purchase_order.quote.sales_associate.commission_rate
 
 def is_admin(user): # checks if the user is an admin
     return user.role == 'admin'

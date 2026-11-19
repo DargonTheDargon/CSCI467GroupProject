@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Purchase Order{% endblock %}
+
+{% block content %}
+<!-- CSS link -->
+<link rel="stylesheet" href="{% static 'css/create_purchase_order.css' %}">
+
+<!-- Container -->
+<div class="po-container"> 
+    {% for message in messages %}
+    <p class="po-message po-message-{{ message.tags }}">{{ message }}</p>
+    {% endfor %}
+
+    <h1>Purchase Order{% if quote %} for Quote #{{ quote.pk }}{% endif %}</h1>
+
+    {% if purchase_order %}
+    {% if not messages %} <!-- Skip if already displayed -->
+    <p class="po-message">This quote was converted to a purchase order on {{ purchase_order.processing_date|date:"F j, Y" }}.</p>
+    {% endif %}
+    {% elif quote.status != "sanctioned" %}
+    <p class="po-message po-message-error">This quote is {{ quote.get_status_display|lower }}. Only sanctioned quotes can be converted to purchase orders.</p>
+    {% endif %}
+
+    <!-- Customer and quote details -->
+    <div class="po-details">
+        <section class="po-card">
+            <h2>Customer</h2>
+            <dl>
+                <dt>Name</dt><dd>{{ quote.customer.name }}</dd>
+                <dt>Address</dt><dd>{{ quote.customer.address }}</dd>
+                <dt>Email</dt><dd>{{ quote.customer.email }}</dd>
+            </dl>
+        </section>
+
+        <section class="po-card">
+            <h2>Quote</h2>
+            <dl>
+                <dt>Status</dt><dd>{{ quote.get_status_display }}</dd>
+                <dt>Sales Associate</dt><dd>{% if quote %}{{ quote.sales_associate.user.get_full_name|default:quote.sales_associate.user.username }}{% endif %}</dd>
+                <dt>Commission Rate</dt><dd>{% if quote %}{{ quote.sales_associate.commission_rate|floatformat:-2 }}%{% endif %}</dd>
+            </dl>
+        </section>
+    </div>
+
+    <!-- Line items -->
+    <div class="po-table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th class="po-amount">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in line_items %}
+                <tr>
+                    <td>{{ item.description }}</td>
+                    <td class="po-amount">${{ item.price }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" class="po-empty">No line items.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pricing -->
+    <dl class="po-totals">
+        <dt>Initial Price</dt>
+        <dd>{% if quote %}${{ subtotal }}{% endif %}</dd>
+
+        <dt>Quote Discount{% if quote.discount_type == "percent" %} ({{ quote.discount_amount|floatformat:-2 }}%){% endif %}</dt>
+        <dd>{% if quote %}&minus;${{ quote_discount_total }}{% endif %}</dd>
+
+        <dt>Price After Discount</dt>
+        <dd>{% if quote %}${{ quoted_price }}{% endif %}</dd>
+
+        {% if purchase_order %}
+        <dt>Final Discount{% if purchase_order.discount_type == "percent" %} ({{ purchase_order.discount_amount|floatformat:-2 }}%){% endif %}</dt>
+        <dd>&minus;${{ final_discount_total }}</dd>
+
+        <dt class="po-grand-total">Final Amount</dt>
+        <dd class="po-grand-total">${{ purchase_order.final_price }}</dd>
+
+        <dt>Commission</dt>
+        <dd>${{ purchase_order.commission_amount }}</dd>
+
+        <dt>Processing Date</dt>
+        <dd>{{ purchase_order.processing_date|date:"F j, Y" }}</dd>
+        {% endif %}
+    </dl>
+
+    {% if form %}
+    <!-- Final discount -->
+    <form method="post" class="po-form" novalidate
+          data-quoted-price="{{ quoted_price }}"
+          data-commission-rate="{{ quote.sales_associate.commission_rate }}">
+        {% csrf_token %}
+
+        {% for error in form.non_field_errors %}
+        <p class="po-error">{{ error }}</p>
+        {% endfor %}
+
+        <label for="{{ form.discount_type.id_for_label }}">{{ form.discount_type.label }}</label>
+        {{ form.discount_type }}
+        {% for error in form.discount_type.errors %}<p class="po-error">{{ error }}</p>{% endfor %}
+
+        <label for="{{ form.discount_amount.id_for_label }}">{{ form.discount_amount.label }}</label>
+        {{ form.discount_amount }}
+        {% for error in form.discount_amount.errors %}<p class="po-error">{{ error }}</p>{% endfor %}
+
+        <!-- Total price and commission -->
+        <dl class="po-totals">
+            <dt class="po-grand-total">Final Amount</dt>
+            <dd class="po-grand-total" id="po-final-amount">{% if quote %}${{ quoted_price }}{% endif %}</dd>
+            <dt>Estimated Commission</dt>
+            <dd id="po-commission"></dd>
+        </dl>
+        <button type="submit" class="po-button"{% if not quote %} disabled{% endif %}>Create Purchase Order</button>
+    </form>
+
+    {% if quote %}
+    <script>
+        (function () {
+            const form = document.querySelector('.po-form');
+            const quoted = parseFloat(form.dataset.quotedPrice);
+            const rate = parseFloat(form.dataset.commissionRate);
+            const type = form.querySelector('[name="discount_type"]');
+            const amount = form.querySelector('[name="discount_amount"]');
+
+            function update() {
+                const discount = parseFloat(amount.value) || 0;
+                let final = type.value === 'percent' ? quoted - quoted * discount / 100 : quoted - discount;
+                final = Math.max(final, 0);
+                document.getElementById('po-final-amount').textContent = '$' + final.toFixed(2);
+                document.getElementById('po-commission').textContent = '$' + (final * rate / 100).toFixed(2);
+            }
+
+            type.addEventListener('change', update);
+            amount.addEventListener('input', update);
+            update();
+        })();
+    </script>
+    {% endif %}
+    {% endif %}
+</div> <!-- End of container -->
+{% endblock %}

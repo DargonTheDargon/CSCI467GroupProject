@@ -1,7 +1,61 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Purchase Orders{% endblock %}
+{% block html_class %}purchase-orders-page{% endblock %}
+
+{% block topbar_buttons %}
+<div class="topbar-actions">
+    <button type="button" id="search-toggle" aria-label="Open search">Search</button>
+    <button type="button" class="sort-button" aria-label="Sort" popovertarget="dropdown-menu">Sort</button>
+</div>
+{% endblock %}
 
 {% block content %}
-    <!-- This page's content -->
+<link rel="stylesheet" href="{% static 'css/purchase_orders.css' %}?v=1">
+
+<div id="dropdown-menu" popover="auto" class="side-menu">
+    <ul role="menu">
+        <li role="menuitem"><a href="{% querystring sort="id" %}">ID Ascending</a></li>
+        <li role="menuitem"><a href="{% querystring sort="-id" %}">ID Descending</a></li>
+        <li role="menuitem"><a href="{% querystring sort="customer" %}">Customer A-Z</a></li>
+        <li role="menuitem"><a href="{% querystring sort="-customer" %}">Customer Z-A</a></li>
+        <li role="menuitem"><a href="{% url 'purchase_orders' %}">Reset</a></li>
+    </ul>
+</div>
+
+<div class="po-list-container">
+    <h1>Purchase Orders</h1>
+
+    <div class="po-list-table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Sanctioned Quotes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="po-list-quotes-cell">
+                        <div class="po-list-quotes">
+                        {% for quote in quotes %}
+                        <div id="quote-{{ quote.pk }}" class="po-list-quote">
+                            <div class="po-list-quote-info">
+                                <span class="po-list-quote-title">Quote #{{ quote.pk }}: {{ quote.customer.name }}</span>
+                                <span>Status: {{ quote.get_status_display }}</span>
+                                <span>Line Item(s): {{ quote.line_item_count }}</span>
+                                <span>Final Price: ${{ quote.final_price|floatformat:2 }}</span>
+                            </div>
+                            <a class="po-list-create-button" href="{% url 'create_purchase_order' quote.pk %}">Create purchase order</a>
+                        </div>
+                        {% empty %}
+                        <p class="po-list-no-quotes">No sanctioned quotes found.</p>
+                        {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

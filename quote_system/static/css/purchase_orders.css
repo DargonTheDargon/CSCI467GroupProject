@@ -1,0 +1,199 @@
+/* Purchase Orders list - styled to match the Sanction Interface */
+.po-list-container {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #000000;
+    background-color: #ffffff;
+    padding: 16px 0;
+    margin: 0 auto;
+}
+
+.po-list-container h1 {
+    padding: 0 12px;
+}
+
+.po-list-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.po-list-container table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin-top: 0;
+}
+
+.po-list-container th,
+.po-list-container td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    color: #000000;
+}
+
+.po-list-container th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #ff9800;
+    color: #ffffff;
+}
+
+.po-list-quotes {
+    max-height: 240px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: 16px;
+}
+
+/* Each quote row: info on the left, button on the right */
+.po-list-quote {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    scroll-margin-top: 48px;
+}
+
+.po-list-quote + .po-list-quote {
+    border-top: 1px solid #ddd;
+}
+
+.po-list-quote:hover {
+    background-color: #fff0d9;
+}
+
+.po-list-quote-info {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.po-list-quote-info > span {
+    display: block;
+}
+
+.po-list-create-button {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 6px 12px;
+    border-radius: 5px;
+    background-color: #ff9800;
+    color: #ffffff;
+    font-size: 13px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.po-list-create-button:hover {
+    background-color: #e68a00;
+}
+
+.po-list-create-button:focus-visible {
+    outline: 2px solid #000000;
+    outline-offset: 2px;
+}
+
+.po-list-no-quotes {
+    margin: 0;
+}
+
+html.purchase-orders-page {
+    height: 100%;
+    overflow: clip;
+}
+
+html.purchase-orders-page body {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+}
+
+@media (max-width: 479px) {
+    main {
+        height: calc(100vh - 4rem);
+        height: calc(100dvh - 4rem);
+        overflow: hidden;
+    }
+
+    .po-list-container {
+        height: 100%;
+        min-height: 0;
+        padding: 12px 0;
+    }
+
+    .po-list-container h1 {
+        margin: 0 0 12px;
+    }
+
+    .po-list-table-wrapper {
+        display: block;
+        flex: 1;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .po-list-quotes {
+        max-height: none;
+        overflow: visible;
+    }
+
+    .po-list-quote {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .po-list-quote:last-child {
+        margin-bottom: 24px;
+    }
+}
+
+@media (min-width: 480px) {
+    main {
+        height: calc(100vh - 4rem);
+        height: calc(100dvh - 4rem);
+        overflow: hidden;
+    }
+
+    .po-list-container {
+        height: 100%;
+        max-width: 800px;
+        min-height: 0;
+        padding: 40px;
+    }
+
+    .po-list-table-wrapper {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .po-list-container table {
+        flex: 1;
+        height: 100%;
+        min-height: 0;
+    }
+
+    .po-list-container tbody,
+    .po-list-container tbody tr,
+    .po-list-quotes-cell {
+        height: 100%;
+    }
+
+    .po-list-quotes {
+        height: 100%;
+        max-height: none;
+        overflow-y: auto;
+    }
+}

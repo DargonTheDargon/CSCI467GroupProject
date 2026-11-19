@@ -10,6 +10,7 @@ urlpatterns = [
     path('quotes/view/<int:pk>/', QuoteView.as_view(), name="quote_view"),
     path('sanction-interface/', views.sanction_interface, name='sanction_interface'),
     path('purchase-orders/', views.purchase_orders, name='purchase_orders'),
+    path('purchase-orders/create/<int:pk>/', views.create_purchase_order, name='create_purchase_order'),
     path('associates/', views.associates, name='associates'),
     path('add-associate/', views.add_associate, name='add_associate'),
     path('edit-associate/<int:pk>/', views.edit_associate, name='edit_associate'),
