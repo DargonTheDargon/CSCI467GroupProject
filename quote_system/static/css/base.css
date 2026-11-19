@@ -95,7 +95,7 @@ a.exit {
 .topbar-actions {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
     gap: 4px;
     flex: 1;
