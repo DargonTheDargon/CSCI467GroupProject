@@ -11,5 +11,8 @@ urlpatterns = [
     path('sanction-interface/', views.sanction_interface, name='sanction_interface'),
     path('purchase-orders/', views.purchase_orders, name='purchase_orders'),
     path('associates/', views.associates, name='associates'),
+    path('add-associate/', views.add_associate, name='add_associate'),
+    path('edit-associate/<int:pk>/', views.edit_associate, name='edit_associate'),
+    path('delete-associate/<int:pk>/', views.delete_associate, name='delete_associate'),
     path('logout/', views.logout_page, name='logout')
 ]
