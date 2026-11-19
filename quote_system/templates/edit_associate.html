@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Associate{% endblock %}
+
+{% block topbar_buttons %} {% endblock %} <!-- No topbar buttons needed for this page -->
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/add_associate.css' %}">
+
+<div class="edit-associate-container">
+    <h1>Edit Sales Associate</h1>
+
+    <form method="post" class="add-associate-form">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="add-associate-field">
+            {{ form.first_name.label_tag }}
+            {{ form.first_name }}
+            {{ form.first_name.errors }}
+        </div>
+
+        <div class="add-associate-field">
+            {{ form.last_name.label_tag }}
+            {{ form.last_name }}
+            {{ form.last_name.errors }}
+        </div>
+
+        <div class="add-associate-field">
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {{ form.username.errors }}
+        </div>
+
+        <div class="add-associate-field">
+            {{ form.password1.label_tag }}
+            {{ form.password1 }}
+            {{ form.password1.errors }}
+        </div>
+
+        <div class="add-associate-field">
+            {{ form.password2.label_tag }}
+            {{ form.password2 }}
+            {{ form.password2.errors }}
+        </div>
+
+        <div class="add-associate-field">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            {{ form.email.errors }}
+        </div>
+
+        <button type="submit" class="add-associate-button">Save Changes</button>
+        <a href="{% url 'associates' %}" class="add-associate-cancel">Cancel</a>
+    </form>
+</div>
+{% endblock %}

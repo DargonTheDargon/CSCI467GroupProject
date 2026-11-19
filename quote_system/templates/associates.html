@@ -3,46 +3,55 @@
 
 {% block title %}Associates{% endblock %}
 
+{% block topbar_buttons %}
+    <header class="topbar" id="buttons">
+        <div class="topbar-actions">
+            <button type=""button" class="sort-button" aria-label="Sort" popovertarget="dropdown-menu">Sort</button>
+        </div>
+    </header>
+{% endblock %}
+
 {% block content %}
-<!-- Link to associates CSS file (temporary until base.html has a head block for page styles) -->
 <link rel="stylesheet" href="{% static 'css/associates.css' %}">
 
-<div class="associates-container"> <!-- Container for the associates page -->
-    <h1>Associates</h1>
+<!-- Sort Menu -->
+<div id="dropdown-menu" popover="auto" class="side-menu">
+    <ul role="menu">
+        <li role="menuitem"><a href="{% querystring sort="first_name" %}">First Name Ascending</a></li>
+        <li role="menuitem"><a href="{% querystring sort="-first_name" %}">First Name Descending</a></li>
+        <li role="menuitem"><a href="{% querystring sort="last_name" %}">Last Name Ascending</a></li>
+        <li role="menuitem"><a href="{% querystring sort="-last_name" %}">Last Name Descending</a></li>
+        <li role="menuitem"><a href="{% querystring sort="accumulated_commission" %}">Commission Ascending</a></li>
+        <li role="menuitem"><a href="{% querystring sort="-accumulated_commission" %}">Commission Descending</a></li>
+    </ul>
+</div>
 
-    <!-- Placeholder link until the Add Associate page exists -->
-    <a href="#" class="associates-add-associate-link">+ Add Associate</a>
+<div class="associates-container">
+    <h1>Sales Associates</h1>
 
-    <div class="associates-table-wrapper"> <!-- Lets the table scroll sideways on small screens -->
-        <table>
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>Email</th> <!-- possibly temporary if we decide to remove emails -->
-                    <th>Full Name</th>
-                    <th>Accumulated Commission</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for associate in sales_associates %}
-                <tr>
-                    <td>{{ associate.user.username }}</td>
-                    <td>{{ associate.user.email }}</td> <!-- possibly temporary if we decide to remove emails -->
-                    <td>{{ associate.user.first_name }} {{ associate.user.last_name }}</td>
-                    <td>{{ associate.accumulated_commission }}</td>
-                    <td>
-                        <a href="#" class="associates-action-link">Edit</a>
-                        <a href="#" class="associates-action-link">Delete</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="associates-empty">No associates found.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div> <!-- End of associates container -->
+    <a href="{% url 'add_associate' %}" class="associates-add-associate-link">Add Associate</a>
+
+    <ul class="associates-list">
+        {% for associate in sales_associates %}
+            <li>
+                <p class="associates-name">{{ associate.user.get_full_name }}</p>
+                <p class="associates-detail">{{ associate.user.username }} &middot; Commission: {{ associate.accumulated_commission }}</p>
+                <div class="associates-actions">
+                    <a href="{% url 'edit_associate' associate.pk %}" class="associates-action-link">Edit</a>
+                    <button type="button" class="associates-action-link" popovertarget="delete-{{ associate.pk }}">Delete</button>
+                    <div id="delete-{{ associate.pk }}" popover class="associates-confirm">
+                        <p>Are you sure you want to delete this associate?</p>
+                        <form method="post" action="{% url 'delete_associate' associate.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="associates-confirm-yes">Yes, Delete</button>
+                            <button type="button" class="associates-confirm-cancel" popovertarget="delete-{{ associate.pk }}">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+        {% empty %}
+            <li class="associates-empty">No associates found.</li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

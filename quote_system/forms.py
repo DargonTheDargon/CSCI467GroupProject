@@ -1,6 +1,7 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
 
-from .models import LineItem, Note, Quote
+from .models import LineItem, Note, Quote, User
 
 
 class LineItemForm(forms.ModelForm):
@@ -21,3 +22,13 @@ class DiscountForm(forms.ModelForm):
         widgets = {
             'discount_type':forms.RadioSelect()
         }
+
+class AddAssociateForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'username']
+
+class EditAssociateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'username']

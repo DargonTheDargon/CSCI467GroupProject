@@ -1,0 +1,76 @@
+/* page container */
+
+.add-associate-container {
+    width: 100%;
+    padding: 20px 16px;
+    color: #000000;
+    background-color: #ffffff;
+}
+
+/* form fields */
+
+.add-associate-field {
+    margin-bottom: 16px;
+}
+
+.add-associate-field label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+}
+
+.add-associate-field input {
+    width: 100%;
+    max-width: 400px;
+    min-height: 44px;
+    padding: 8px;
+    font-size: 1em;
+}
+
+.add-associate-field ul {
+    padding-left: 20px;
+    font-size: 0.85em;
+    color: #555555;
+}
+
+.add-associate-field .errorlist,
+.add-associate-form .errorlist {
+    list-style: none;
+    padding: 0;
+    color: #b00020;
+}
+
+/* buttons and links */
+
+.add-associate-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ff9800;
+    color: #ffffff;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.add-associate-button:hover {
+    background-color: #e68a00;
+}
+
+.add-associate-cancel {
+    display: inline-block;
+    margin-left: 16px;
+    color: #ff9800;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.add-associate-cancel:hover {
+    text-decoration: underline;
+    color: #e68a00;
+}
+
+@media (min-width: 600px) {
+    .add-associate-container {
+        padding: 20px 24px;
+    }
+}

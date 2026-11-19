@@ -1,31 +1,14 @@
-/* Mobile Container Sizing */
+/* page container */
 .associates-container {
     width: 100%;
-    max-width: 100%; /* To span the full width on mobile devices */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    padding: 20px 16px;
     color: #000000;
     background-color: #ffffff;
-    padding: 20px 10px;
-    margin: 0 auto;
-}
-
-/*Add Associate Button Styling */
-.associates-button {
-    background-color: #ff9800;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 20px;
 }
 
 .associates-add-associate-link {
     display: inline-block;
-    margin-top: 20px;
+    margin: 10px 0;
     color: #ff9800;
     text-decoration: none;
     font-weight: bold;
@@ -36,10 +19,43 @@
     color: #e68a00;
 }
 
+/* associates list */
+.associates-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.associates-list li {
+    padding: 16px 0;
+    border-bottom: 2px solid #ff9800;
+}
+
+.associates-name {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.associates-detail {
+    font-size: 0.9em;
+    color: #555555;
+}
+
+.associates-actions {
+    margin-top: 8px;
+}
+
 .associates-action-link {
+    display: inline-block;
+    min-height: 44px;
+    margin-right: 16px;
+    padding: 10px 0;
+    border: none;
+    background: none;
+    font: inherit;
     color: #ff9800;
     text-decoration: none;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .associates-action-link:hover {
@@ -47,47 +63,115 @@
     color: #e68a00;
 }
 
-/* Table Styling */
-.associates-container table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+.associates-empty {
+    text-align: center;
+    font-size: 1.2em;
+    color: #555555;
 }
 
-.associates-table-wrapper {
-    width: 100%;
-    overflow-x: auto; /*For mobile devices*/
+@media (min-width: 600px) {
+    .associates-container {
+        padding: 20px 24px;
+    }
 }
 
-.associates-container th,
-.associates-container td {
-    border: 1px solid #ddd;
+/* Add Associate Form */
+
+.associates-form p {
+    margin-bottom: 16px;
+}
+
+.associates-form label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+}
+
+.associates-form input {
+    width: 100%;
+    max-width: 400px;
+    min-height: 44px;
     padding: 8px;
-    text-align: left;
+    font-size: 1em;
+}
+
+.associates-form .helptext {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.85em;
+    color: #555555;
+}
+
+.associates-form .errorlist {
+    list-style: none;
+    padding: 0;
+    color: #b00020;
+}
+
+.associates-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ff9800;
+    color: #ffffff;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.associates-button:hover {
+    background-color: #e68a00;
+}
+
+/* Delete Confirmation Popup */
+
+.associates-confirm {
+    width: min(90vw, 360px);
+    padding: 20px;
+    border: 2px solid #ff9800;
+    border-radius: 8px;
+    background-color: #ffffff;
     color: #000000;
 }
 
-.associates-container th {
-    background-color: #ff9800;
+.associates-confirm::backdrop {
+    background-color: rgb(0 0 0 / 50%); /* dim the background */
+}
+
+.associates-confirm p {
+    margin-bottom: 16px;
+}
+
+.associates-confirm-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.associates-confirm-yes,
+.associates-confirm-cancel {
+    min-height: 44px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.associates-confirm-yes {
+    background-color: #b00020;
     color: #ffffff;
 }
 
-.associates-container tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+.associates-confirm-yes:hover {
+    background-color: #8a0016;
 }
 
-.associates-container tbody tr:hover {
-    background-color: #fff0d9;
+.associates-confirm-cancel {
+    background-color: #eeeeee;
+    color: #000000;
 }
 
-.associates-empty {
-    text-align: center;
-    padding: 20px;
-}
-
-@media (min-width: 480px) {
-    .associates-container {
-        max-width: 800px;
-        padding: 40px;
-    }
+.associates-confirm-cancel:hover {
+    background-color: #dddddd;
 }
