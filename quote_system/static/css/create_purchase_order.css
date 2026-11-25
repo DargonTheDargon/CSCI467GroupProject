@@ -1,7 +1,6 @@
-/* Mobile Container Sizing */
 .po-container {
     width: 100%;
-    max-width: 100%; /* To span the full width on mobile devices */
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -11,7 +10,7 @@
     margin: 0 auto;
 }
 
-/* Form and Inputs Setup */
+/* inputs */
 .po-form {
     width: 100%;
     display: flex;
@@ -42,7 +41,7 @@
     border-color: #ff9800;
 }
 
-/* Submit Button Styling */
+/* submit button */
 .po-button {
     width: 100%;
     padding: 10px 15px;
@@ -60,7 +59,7 @@
     background-color: #e68a00;
 }
 
-/* Validation errors and success messages */
+/* messages */
 .po-error {
     color: #c62828;
     margin: -10px 0 15px;
@@ -87,7 +86,7 @@
     }
 }
 
-/* Customer and quote detail cards */
+/* quote details */
 .po-details {
     width: 100%;
     display: flex;
@@ -125,10 +124,10 @@
     overflow-wrap: anywhere;
 }
 
-/* Line items table */
+/* line items */
 .po-table-wrapper {
     width: 100%;
-    overflow-x: auto; /* For mobile devices */
+    overflow-x: auto; /* mobile improvement */
     margin-top: 20px;
 }
 
@@ -163,7 +162,7 @@
     padding: 20px;
 }
 
-/* Price breakdown */
+/* pricing */
 .po-totals {
     width: 100%;
     margin: 20px 0 0;

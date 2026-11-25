@@ -1,4 +1,3 @@
-/* Purchase Orders list - styled to match the Sanction Interface */
 .po-list-container {
     width: 100%;
     max-width: 100%;
@@ -51,7 +50,6 @@
     padding-bottom: 16px;
 }
 
-/* Each quote row: info on the left, button on the right */
 .po-list-quote {
     display: flex;
     align-items: center;

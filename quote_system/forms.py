@@ -31,7 +31,7 @@ class PurchaseOrderForm(forms.ModelForm):
             'discount_type': 'Final Discount Type',
             'discount_amount': 'Final Discount',
         }
-
+    # validate that the discount is not negative and that a percentage discount is not more than 100%
     def clean(self):
         cleaned_data = super().clean()
         discount_type = cleaned_data.get('discount_type')

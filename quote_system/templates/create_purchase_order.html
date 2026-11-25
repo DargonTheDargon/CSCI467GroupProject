@@ -4,10 +4,8 @@
 {% block title %}Purchase Order{% endblock %}
 
 {% block content %}
-<!-- CSS link -->
 <link rel="stylesheet" href="{% static 'css/create_purchase_order.css' %}">
 
-<!-- Container -->
 <div class="po-container"> 
     {% for message in messages %}
     <p class="po-message po-message-{{ message.tags }}">{{ message }}</p>
@@ -16,14 +14,14 @@
     <h1>Purchase Order{% if quote %} for Quote #{{ quote.pk }}{% endif %}</h1>
 
     {% if purchase_order %}
-    {% if not messages %} <!-- Skip if already displayed -->
+    {% if not messages %} <!-- skip message if already displayed -->
     <p class="po-message">This quote was converted to a purchase order on {{ purchase_order.processing_date|date:"F j, Y" }}.</p>
     {% endif %}
     {% elif quote.status != "sanctioned" %}
     <p class="po-message po-message-error">This quote is {{ quote.get_status_display|lower }}. Only sanctioned quotes can be converted to purchase orders.</p>
     {% endif %}
 
-    <!-- Customer and quote details -->
+    <!-- customer and quote details -->
     <div class="po-details">
         <section class="po-card">
             <h2>Customer</h2>
@@ -44,7 +42,7 @@
         </section>
     </div>
 
-    <!-- Line items -->
+    <!-- line items -->
     <div class="po-table-wrapper">
         <table>
             <thead>
@@ -68,7 +66,7 @@
         </table>
     </div>
 
-    <!-- Pricing -->
+    <!-- pricing -->
     <dl class="po-totals">
         <dt>Initial Price</dt>
         <dd>{% if quote %}${{ subtotal }}{% endif %}</dd>
@@ -95,7 +93,7 @@
     </dl>
 
     {% if form %}
-    <!-- Final discount -->
+    <!-- discount -->
     <form method="post" class="po-form" novalidate
           data-quoted-price="{{ quoted_price }}"
           data-commission-rate="{{ quote.sales_associate.commission_rate }}">
@@ -113,7 +111,7 @@
         {{ form.discount_amount }}
         {% for error in form.discount_amount.errors %}<p class="po-error">{{ error }}</p>{% endfor %}
 
-        <!-- Total price and commission -->
+        <!-- final price and commission -->
         <dl class="po-totals">
             <dt class="po-grand-total">Final Amount</dt>
             <dd class="po-grand-total" id="po-final-amount">{% if quote %}${{ quoted_price }}{% endif %}</dd>
@@ -147,5 +145,5 @@
     </script>
     {% endif %}
     {% endif %}
-</div> <!-- End of container -->
+</div>
 {% endblock %}

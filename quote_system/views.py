@@ -145,8 +145,9 @@ def sanction_interface(request):
         sanction_interface_url = f"{sanction_interface_url}?{request.GET.urlencode()}"
     return render(request, 'sanction_interface.html', {'show_no_quote_error': show_no_quote_error, 'show_edit_confirmation': show_edit_confirmation, 'show_sanction_confirmation': show_sanction_confirmation, 'show_secret_notes': show_secret_notes, 'show_secret_notes_view': show_secret_notes_view, 'show_add_secret_note': show_add_secret_note, 'show_delete_secret_note_confirmation': show_delete_secret_note_confirmation, 'pending_note': pending_note, 'secret_note_form': secret_note_form, 'selected_quote': selected_quote, 'secret_notes': secret_notes, 'show_apply_discount': show_apply_discount, 'quotes': quotes, 'selected_quote_ids': selected_quote_ids, 'sanction_interface_url': sanction_interface_url})
 
+# list sanctioned quotes
 @login_required
-def purchase_orders(request): # lists sanctioned quotes that can be converted into purchase orders
+def purchase_orders(request): 
     sort_order = {
         'id': 'pk',
         '-id': '-pk',
@@ -158,8 +159,9 @@ def purchase_orders(request): # lists sanctioned quotes that can be converted in
     ).annotate(line_item_count=Count('line_items')).order_by(sort_order)
     return render(request, 'purchase_orders.html', {'quotes': quotes})
 
+# show details and create a purchase order for the selected quote
 @login_required
-def create_purchase_order(request, pk): # shows the selected quote and customer details for converting it into a purchase order
+def create_purchase_order(request, pk): 
     quote = get_object_or_404(
         Quote.objects.select_related('customer', 'sales_associate__user'), pk=pk
     )
@@ -180,7 +182,7 @@ def create_purchase_order(request, pk): # shows the selected quote and customer 
         form = PurchaseOrderForm(request.POST or None)
         if request.method == 'POST' and form.is_valid():
             with transaction.atomic():
-                # Lock the quote so a double submit can't create two purchase orders
+                # lock the quote so a double submit can't create two purchase orders
                 quote = Quote.objects.select_for_update().select_related(
                     'customer', 'sales_associate'
                 ).get(pk=quote.pk)
@@ -192,9 +194,7 @@ def create_purchase_order(request, pk): # shows the selected quote and customer 
                 purchase_order.final_price = max(
                     quoted_price - final_discount(purchase_order, quoted_price), Decimal('0.00')
                 )
-
-                # Stand-in for the external processing system, which answers with
-                # a processing date and the associate's commission rate.
+                # external processing system returns processing date and the associate's commission rate.
                 processing_date, commission_rate = process_purchase_order(purchase_order)
                 purchase_order.processing_date = processing_date
                 purchase_order.commission_amount = (
@@ -208,7 +208,7 @@ def create_purchase_order(request, pk): # shows the selected quote and customer 
                 quote.status = Quote.Status.ORDERED
                 quote.save(update_fields=['status'])
 
-            # TODO: send the purchase details email to the customer
+            # success message (no email actually sent)
             messages.success(
                 request,
                 f"The order was placed on {date_format(timezone.localdate(processing_date), 'F j, Y')} "
@@ -218,12 +218,14 @@ def create_purchase_order(request, pk): # shows the selected quote and customer 
         context['form'] = form
     return render(request, 'create_purchase_order.html', context)
 
-def final_discount(purchase_order, base_amount): # same rules as Quote.calculate_discount, applied to the final discount
+# calculate final discount
+def final_discount(purchase_order, base_amount): 
     if purchase_order.discount_type == Quote.DiscountType.PERCENT:
         return (base_amount * purchase_order.discount_amount / Decimal(100)).quantize(Decimal('0.01'))
     return min(purchase_order.discount_amount, base_amount)
 
-def process_purchase_order(purchase_order): # placeholder for the external processing system
+# return processing date and commission rate for a purchase order
+def process_purchase_order(purchase_order): 
     return timezone.now(), purchase_order.quote.sales_associate.commission_rate
 
 def is_admin(user): # checks if the user is an admin
