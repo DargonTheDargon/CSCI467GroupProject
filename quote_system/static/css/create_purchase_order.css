@@ -1,0 +1,199 @@
+.po-container {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #000000;
+    background-color: #ffffff;
+    padding: 20px 10px;
+    margin: 0 auto;
+}
+
+/* inputs */
+.po-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.po-form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.po-form input,
+.po-form select {
+    width: 100%;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #ffffff;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.po-form input:focus,
+.po-form select:focus {
+    border-color: #ff9800;
+}
+
+/* submit button */
+.po-button {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #ff9800;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.2s;
+}
+
+.po-button:hover {
+    background-color: #e68a00;
+}
+
+/* messages */
+.po-error {
+    color: #c62828;
+    margin: -10px 0 15px;
+    font-size: 14px;
+}
+
+.po-message {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 8px;
+    background-color: #fff0d9;
+    border-left: 4px solid #ff9800;
+}
+
+.po-message-error {
+    background-color: #fdecea;
+    border-left-color: #c62828;
+}
+
+@media (min-width: 480px) {
+    .po-container {
+        max-width: 800px;
+        padding: 40px;
+    }
+}
+
+/* quote details */
+.po-details {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.po-card {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-top: 4px solid #ff9800;
+    border-radius: 8px;
+}
+
+.po-card h2 {
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+.po-card dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 5px 15px;
+}
+
+.po-card dt {
+    font-weight: bold;
+}
+
+.po-card dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+/* line items */
+.po-table-wrapper {
+    width: 100%;
+    overflow-x: auto; /* mobile improvement */
+    margin-top: 20px;
+}
+
+.po-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.po-container th,
+.po-container td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.po-container th {
+    background-color: #ff9800;
+    color: #ffffff;
+}
+
+.po-container tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.po-container .po-amount {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.po-empty {
+    text-align: center;
+    padding: 20px;
+}
+
+/* pricing */
+.po-totals {
+    width: 100%;
+    margin: 20px 0 0;
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    gap: 8px 15px;
+}
+
+.po-totals dd {
+    margin: 0;
+    text-align: right;
+}
+
+.po-totals .po-grand-total {
+    padding-top: 8px;
+    border-top: 2px solid #ff9800;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.po-form .po-totals {
+    margin: 5px 0 10px;
+}
+
+@media (min-width: 600px) {
+    .po-details {
+        flex-direction: row;
+    }
+}
+
+.po-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
