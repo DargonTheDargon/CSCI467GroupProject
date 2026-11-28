@@ -5,21 +5,24 @@
 {% block html_class %}sanction-interface-page{% endblock %}
 
 {% block topbar_buttons %}
+{# Search uses the query string and sort links keep the search term #}
 <div class="topbar-actions">
-    <button type="button" id="search-toggle" aria-label="Open search">Search</button>
+    <form class="topbar-actions" method="get">
+        <input class="search-bar" type="text" name="search" value="{{ request.GET.search|default:'' }}" placeholder="Lookup by sales associate, customer, status">
+        <button type="submit" id="search-toggle" aria-label="Search quotes">Search</button>
+    </form>
     <button type="button" class="sort-button" aria-label="Sort" popovertarget="dropdown-menu">Sort</button>
 </div>
 {% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/sanction_interface.css' %}?v=24">
+<link rel="stylesheet" href="{% static 'css/sanction_interface.css' %}?v=27">
 
+{# Sort links change the order and Reset clears the filters #}
 <div id="dropdown-menu" popover="auto" class="side-menu">
     <ul role="menu">
-        <li role="menuitem"><a href="{% querystring sort="status" %}">Status Ascending</a></li>
-        <li role="menuitem"><a href="{% querystring sort="-status" %}">Status Descending</a></li>
-        <li role="menuitem"><a href="{% querystring sort="id" %}">ID Ascending</a></li>
-        <li role="menuitem"><a href="{% querystring sort="-id" %}">ID Descending</a></li>
+        <li role="menuitem"><a href="{% querystring sort="id" notes=None %}">ID Ascending</a></li>
+        <li role="menuitem"><a href="{% querystring sort="-id" notes=None %}">ID Descending</a></li>
         <li role="menuitem"><a href="{% url 'sanction_interface' %}">Reset</a></li>
     </ul>
 </div>
@@ -28,15 +31,14 @@
     <h1>Sanction Interface</h1>
 
     {% if show_no_quote_error %}
+    {# Show this when an action needs a quote but none is selected #}
     <p id="sanction-error" class="sanction-error" role="alert">
         Error: No Quote Selected
     </p>
     {% endif %}
+    {# These buttons act on the quote selected in the session #}
     <form method="post" class="sanction-interface-form">
         {% csrf_token %}
-        {% if selected_quote_ids %}
-        <input type="hidden" name="selected_quote_id" value="{{ selected_quote_ids.0 }}">
-        {% endif %}
         <div class="sanction-options">
             <button type="submit" name="action" value="edit">Edit</button>
             <button type="submit" name="action" value="apply_discount">Apply Discount</button>
@@ -55,12 +57,13 @@
                 <tr>
                     <td class="sanction-quotes-cell">
                         <div class="sanction-quotes-list">
+                        {# The view supplies finalized quotes and each row toggles its selection #}
                         {% for quote in quotes %}
                         <form id="quote-{{ quote.pk }}" method="post" action="{{ sanction_interface_url }}" class="sanction-quote-form">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="toggle_quote">
                             <input type="hidden" name="quote_id" value="{{ quote.pk }}">
-                            <button type="submit" class="sanction-quote" aria-pressed="{% if quote.pk in selected_quote_ids %}true{% else %}false{% endif %}">
+                            <button type="submit" class="sanction-quote" aria-pressed="{% if quote.pk == selected_quote_id %}true{% else %}false{% endif %}">
                                 <span class="sanction-quote-bubble" aria-hidden="true"></span>
                                 <span class="sanction-visually-hidden">Select or unselect quote #{{ quote.pk }}</span>
                                 <span class="sanction-quote-title">Quote #{{ quote.pk }}: {{ quote.customer.name }}</span>
@@ -78,6 +81,7 @@
             </tbody>
         </table>
     </div>
+    {# Ask before changing the quote to sanctioned #}
     {% if show_sanction_confirmation %}
     <div class="sanction-modal-backdrop">
         <form method="post">
@@ -92,6 +96,7 @@
         </form>
     </div>
     {% endif %}
+    {# Confirm before opening the quote editor #}
     {% if show_edit_confirmation %}
     <div class="sanction-modal-backdrop">
         <form method="post" class="sanction-modal-backdrop-close-form">
@@ -110,6 +115,7 @@
         </form>
     </div>
     {% endif %}
+    {# Open the notes menu for the selected quote #}
     {% if show_secret_notes %}
     <div class="sanction-modal-backdrop">
         <form method="post" class="sanction-modal-backdrop-close-form">
@@ -128,6 +134,7 @@
         </form>
     </div>
     {% endif %}
+    {# Show this quote's notes and their available actions #}
     {% if show_secret_notes_view %}
     <div class="sanction-modal-backdrop">
         <form method="post" class="sanction-modal-backdrop-close-form">
@@ -137,6 +144,7 @@
         <section class="sanction-modal sanction-modal-form" role="dialog" aria-modal="true" aria-labelledby="secret-notes-view-title">
             <h2 id="secret-notes-view-title">Secret Note(s) for Quote #{{ selected_quote.pk }}</h2>
             {% if secret_notes %}
+            {# Each note can open its own delete confirmation #}
             <ul class="sanction-note-list">
                 {% for note in secret_notes %}
                 <li>
@@ -161,6 +169,7 @@
         </section>
     </div>
     {% endif %}
+    {# Confirm before removing the note #}
     {% if show_delete_secret_note_confirmation %}
     <div class="sanction-modal-backdrop">
         <form method="post" class="sanction-modal-backdrop-close-form">
@@ -182,6 +191,7 @@
         </form>
     </div>
     {% endif %}
+    {# Cancel should work even when the note field is empty #}
     {% if show_add_secret_note %}
     <div class="sanction-modal-backdrop">
         <form method="post" class="sanction-modal-backdrop-close-form">
@@ -203,19 +213,47 @@
         </form>
     </div>
     {% endif %}
+    {# Choose a discount type, then enter its amount #}
     {% if show_apply_discount %}
     <div class="sanction-modal-backdrop">
         <form method="post" class="sanction-modal-backdrop-close-form">
             {% csrf_token %}
             <button type="submit" name="action" value="close_apply_discount" aria-label="Close apply discount dialog"></button>
         </form>
-        <section class="sanction-modal" role="dialog" aria-modal="true" aria-labelledby="apply-discount-modal-title">
-            <h2 id="apply-discount-modal-title">Apply Discount</h2>
-            <div class="sanction-modal-actions">
-                <button type="button">Percent</button>
-                <button type="button">Amount</button>
-            </div>
-        </section>
+        {% if show_discount_amount_form %}
+        {# Carry the selected type into the amount form #}
+        <form method="post" class="sanction-modal-form sanction-discount-form">
+            {% csrf_token %}
+            <input type="hidden" name="discount_type" value="{{ selected_discount_type }}">
+            <section class="sanction-modal" role="dialog" aria-modal="true" aria-labelledby="apply-discount-modal-title">
+                <h2 id="apply-discount-modal-title">Apply {% if selected_discount_type == "percent" %}Percent{% else %}Flat{% endif %} Discount</h2>
+                {# Keep validation errors visible in the dialog #}
+                {% for error in sanction_discount_form.discount_amount.errors %}
+                <p class="sanction-discount-error" role="alert">{{ error }}</p>
+                {% endfor %}
+                <label for="{{ sanction_discount_form.discount_amount.id_for_label }}">
+                    {% if selected_discount_type == "percent" %}Percent{% else %}Flat{% endif %} Discount
+                </label>
+                {{ sanction_discount_form.discount_amount }}
+                <div class="sanction-modal-actions">
+                    <button type="submit" name="action" value="save_sanction_discount">Apply</button>
+                    <button type="submit" name="action" value="close_apply_discount">Cancel</button>
+                </div>
+            </section>
+        </form>
+        {% else %}
+        <form method="post" class="sanction-modal-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="choose_discount_type">
+            <section class="sanction-modal" role="dialog" aria-modal="true" aria-labelledby="apply-discount-modal-title">
+                <h2 id="apply-discount-modal-title">Apply Discount</h2>
+                <div class="sanction-modal-actions">
+                    <button type="submit" name="discount_type" value="percent">Percent</button>
+                    <button type="submit" name="discount_type" value="flat">Flat</button>
+                </div>
+            </section>
+        </form>
+        {% endif %}
     </div>
     {% endif %}
 </div>
