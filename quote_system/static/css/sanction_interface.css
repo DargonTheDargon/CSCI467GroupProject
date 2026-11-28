@@ -1,3 +1,4 @@
+/* Page layout and quote table */
 .sanction-container {
     width: 100%;
     max-width: 100%;
@@ -24,6 +25,7 @@
     -webkit-overflow-scrolling: touch;
 }
 
+/* Timed messages for validation and selection errors */
 .sanction-error {
     box-sizing: border-box;
     width: 80%;
@@ -32,7 +34,14 @@
     color: #d00000;
     font-weight: bold;
     text-align: right;
-    animation: sanction-error-timeout 5s forwards;
+    animation: sanction-error-timeout 3s forwards;
+}
+
+/* Keep the sort button highlighted while its menu is open or hovered */
+html.sanction-interface-page:has(#dropdown-menu:popover-open) .sort-button,
+html.sanction-interface-page .topbar .topbar-actions .sort-button:hover {
+    color: #ffffff;
+    background-color: #e68a00;
 }
 
 @keyframes sanction-error-timeout {
@@ -53,6 +62,7 @@
     margin: 0;
 }
 
+/* Shared backdrop and modal styles */
 .sanction-modal-backdrop {
     position: fixed !important;
     z-index: 99999;
@@ -140,6 +150,7 @@
     background-color: #e68a00;
 }
 
+/* Secret note list and note forms */
 .sanction-note-list {
     max-height: 50vh;
     overflow-y: auto;
@@ -220,6 +231,27 @@
     animation: sanction-error-timeout 3s forwards;
 }
 
+/* Discount amount field inside the modal */
+.sanction-discount-form label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.sanction-discount-form input[type="number"] {
+    box-sizing: border-box;
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 8px;
+    font: inherit;
+}
+
+.sanction-discount-error {
+    margin: 0 0 12px;
+    color: #d00000;
+    animation: sanction-error-timeout 3s forwards;
+}
+
+/* Scrollable quote list and selection controls */
 .sanction-quotes-list {
     max-height: 240px;
     overflow-y: auto;
@@ -229,6 +261,7 @@
 
 .sanction-quote-form {
     margin: 0;
+    /* Keep selected rows below the sticky heading */
     scroll-margin-top: 48px;
 }
 
@@ -284,19 +317,11 @@
     border-top: 1px solid #ddd;
 }
 
-.sanction-quote h2 {
-    margin: 0 0 8px;
-    font-size: 1.1rem;
-}
-
-.sanction-quote p {
-    margin: 4px 0;
-}
-
 .sanction-no-quotes {
     margin: 0;
 }
 
+/* Quote actions and table styling */
 .sanction-options {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -346,6 +371,7 @@
     background-color: #fff0d9;
 }
 
+/* Keep scrolling inside the quote list */
 html.sanction-interface-page {
     height: 100%;
     overflow: clip;
@@ -358,6 +384,7 @@ html.sanction-interface-page body {
 }
 
 @media (max-width: 479px) {
+    /* Let the table use the remaining height on small screens */
     main {
         height: calc(100vh - 4rem);
         height: calc(100dvh - 4rem);
@@ -402,6 +429,7 @@ html.sanction-interface-page body {
 }
 
 @media (min-width: 480px) {
+    /* Center the content and scroll the list on larger screens */
     main {
         height: calc(100vh - 4rem);
         height: calc(100dvh - 4rem);

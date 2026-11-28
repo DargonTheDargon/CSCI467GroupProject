@@ -23,6 +23,20 @@ class DiscountForm(forms.ModelForm):
             'discount_type':forms.RadioSelect()
         }
 
+    def clean(self):
+        # Read the discount values after field validation
+        cleaned_data = super().clean()
+        discount_type = cleaned_data.get('discount_type')
+        discount_amount = cleaned_data.get('discount_amount')
+        if discount_amount is not None:
+            # A negative discount would increase the quote price
+            if discount_amount < 0:
+                self.add_error('discount_amount', 'The discount cannot be negative.')
+            # A percentage discount cannot exceed the full amount
+            elif discount_type == Quote.DiscountType.PERCENT and discount_amount > 100:
+                self.add_error('discount_amount', 'A percentage discount cannot be more than 100%.')
+        return cleaned_data
+
 class PurchaseOrderForm(forms.ModelForm):
     class Meta:
         model = PurchaseOrder

@@ -1,15 +1,18 @@
 {% load static %}
+{# Shared page shell with blocks for page-specific content #}
 <!doctype html>
 <html lang="en" class="{% block html_class %}{% endblock %}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {# Pages can load an extra stylesheet here #}
     {% block quotecss %}{% endblock %}
     <title>{% block title %}Quick Quotes{% endblock %}</title>
 </head>
 <body>
     <header class="topbar">
+        {# Shared navigation with an additional Associates link for admins only #}
         <details class="nav-menu">
             <summary aria-label="Toggle navigation menu">☰</summary>
             <nav class="side-menu" aria-label="Main navigation">
@@ -25,11 +28,13 @@
                 </form>
             </nav>
         </details>
+        {# Pages place their own header controls in this block #}
         {% block topbar_buttons %}
         {% endblock %}
     </header>
 
     <main>
+        {# Render each page inside the shared layout #}
         {% block content %}{% endblock %}
     </main>
 </body>

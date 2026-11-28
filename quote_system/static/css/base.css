@@ -1,3 +1,4 @@
+/* Shared box sizing and page typography */
 * {
     box-sizing: border-box;
 }
@@ -8,10 +9,11 @@ body {
 }
 
 a.exit {
-        color: #fff;
+    color: #fff;
     font-size: 1.5rem;
 }
 
+/* Header layout shared by app pages */
 .topbar {
     position: relative;
     min-height: 4rem;
@@ -31,6 +33,7 @@ a.exit {
     position: static;
 }
 
+/* Navigation menu trigger and dropdown */
 .nav-menu summary {
     display: flex;
     align-items: center;
@@ -57,6 +60,7 @@ a.exit {
     box-shadow: 2px 4px 8px rgb(0 0 0 / 20%);
 }
 
+/* Dropdown links and logout button */
 .side-menu a {
     display: block;
     padding: 1rem;
@@ -92,6 +96,7 @@ a.exit {
     background-color: #e68a00;
 }
 
+/* Header controls supplied by each page */
 .topbar-actions {
     display: flex;
     flex-direction: row;
@@ -135,6 +140,7 @@ a.exit {
     background-color: #fff;
 }
 
+/* Place the sort menu beside its button */
 #dropdown-menu {
     position:absolute;
     margin: 0;
@@ -158,13 +164,10 @@ a.exit {
     margin: 0;  /* Removes default spacing */
 }
 
+/* Search field and utility visibility */
 .search-bar {
     width: 70%;
     max-width: 700px;
-}
-
-#search-bar input {
-    width: 100%;
     min-height: 44px;
     padding: 0.5rem;
     font-size: 1rem;
@@ -174,6 +177,7 @@ a.exit {
     display: none !important;
 }
 
+/* Add horizontal padding on wider screens */
 @media (min-width: 600px) {
     .topbar {
         padding-inline: 1.5rem;

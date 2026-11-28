@@ -6,6 +6,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import CharField, Count, F, Q, Value
 from django.db.models.functions import Concat
+from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -51,99 +52,169 @@ def quote_view(request):
 
 @login_required
 def sanction_interface(request):
+    # Recognize actions that need a quote to be selected
     actions = {
-        'edit', 'confirm_edit', 'apply_discount', 'secret_notes',
+        'edit', 'confirm_edit', 'apply_discount', 'choose_discount_type',
+        'save_sanction_discount', 'secret_notes',
         'view_secret_notes', 'add_secret_note', 'save_secret_note',
         'delete_secret_note', 'confirm_delete_secret_note', 'keep_secret_note',
         'sanction', 'confirm_sanction',
     }
+    # Remember the selected quote and show notes once after a redirect
     selection_session_key = 'sanction_interface_selected_quote_id'
+    notes_view_session_key = 'sanction_notes_view_after_redirect'
+
+    def build_sanction_interface_url(fragment=None):
+        # Keep search and sort, drop the notes parameter, and optionally add an anchor
+        query_parameters = request.GET.copy()
+        query_parameters.pop('notes', None)
+        url = reverse('sanction_interface')
+        if query_parameters:
+            url = f"{url}?{query_parameters.urlencode()}"
+        if fragment:
+            url = f"{url}#{fragment}"
+        return url
+
+    def redirect_to_secret_notes_view():
+        # A one-time flag keeps an old URL from reopening the notes
+        request.session[notes_view_session_key] = True
+        return redirect(build_sanction_interface_url())
+
+    # Use the supported ID sort options and default to ascending ID
     sort_order = {
-        'status': 'status',
-        '-status': '-status',
         'id': 'pk',
         '-id': '-pk',
     }.get(request.GET.get('sort'), 'pk')
+    # Handle selection separately so the page can scroll to that quote
     if request.method == 'POST' and request.POST.get('action') == 'toggle_quote':
+        # Clicking the selected quote again clears it
         quote = get_object_or_404(
             Quote, pk=request.POST.get('quote_id'), status=Quote.Status.FINALIZED
         )
-        redirect_url = reverse('sanction_interface')
-        query_string = request.GET.urlencode()
-        if query_string:
-            redirect_url = f"{redirect_url}?{query_string}"
+        # Clear the selection if this quote is already selected
         if str(request.session.get(selection_session_key)) == str(quote.pk):
             request.session.pop(selection_session_key, None)
-            return redirect(redirect_url)
+            return redirect(build_sanction_interface_url())
         request.session[selection_session_key] = quote.pk
-        return redirect(f"{redirect_url}#quote-{quote.pk}")
+        return redirect(build_sanction_interface_url(fragment=f'quote-{quote.pk}'))
 
+    # Only recognized quote actions can trigger the no-selection error
     action_submitted = request.method == 'POST' and request.POST.get('action') in actions
     selected_quote_id = request.session.get(selection_session_key)
     selected_quote = Quote.objects.select_related('customer').filter(
         pk=selected_quote_id, status=Quote.Status.FINALIZED
     ).first() if selected_quote_id else None
+    # Clear the selection if the quote is no longer finalized
     if selected_quote_id and selected_quote is None:
         request.session.pop(selection_session_key, None)
         selected_quote_id = None
-    selected_quote_ids = [selected_quote_id] if selected_quote_id else []
-    show_no_quote_error = action_submitted and not selected_quote_ids
+    # Show an error when a quote action has no selected quote
+    show_no_quote_error = action_submitted and not selected_quote_id
     action = request.POST.get('action') if request.method == 'POST' else None
+    # Show the notes list after View or once after a save or delete
+    show_notes_after_redirect = (
+        request.method == 'GET'
+        and request.session.pop(notes_view_session_key, False)
+    )
     show_secret_notes_view = bool(selected_quote) and (
         action == 'view_secret_notes'
-        or request.method == 'GET' and request.GET.get('notes') == 'view'
+        or show_notes_after_redirect
     )
     show_add_secret_note = action == 'add_secret_note' and bool(selected_quote)
     secret_note_form = NoteForm()
+    # Save a valid note or keep the form open to show its errors
     if action == 'save_secret_note' and selected_quote:
         secret_note_form = NoteForm(request.POST)
         if secret_note_form.is_valid():
             note = secret_note_form.save(commit=False)
             note.quote = selected_quote
             note.save()
-            query_parameters = request.GET.copy()
-            query_parameters['notes'] = 'view'
-            return redirect(f"{reverse('sanction_interface')}?{query_parameters.urlencode()}")
+            return redirect_to_secret_notes_view()
         else:
             show_add_secret_note = True
     pending_note = None
     show_delete_secret_note_confirmation = False
+    # Only allow note actions on notes belonging to the selected quote
     if action in {'delete_secret_note', 'confirm_delete_secret_note', 'keep_secret_note'} and selected_quote:
         pending_note = get_object_or_404(selected_quote.notes, pk=request.POST.get('note_id'))
+        # Ask for confirmation before deleting
         if action == 'delete_secret_note':
             show_delete_secret_note_confirmation = True
+        # Delete after confirmation or return to the list when kept
         elif action == 'confirm_delete_secret_note':
             pending_note.delete()
-            query_parameters = request.GET.copy()
-            query_parameters['notes'] = 'view'
-            return redirect(f"{reverse('sanction_interface')}?{query_parameters.urlencode()}")
+            return redirect_to_secret_notes_view()
         else:
-            query_parameters = request.GET.copy()
-            query_parameters['notes'] = 'view'
-            return redirect(f"{reverse('sanction_interface')}?{query_parameters.urlencode()}")
+            return redirect_to_secret_notes_view()
+    # Set which confirmation or popup the template should show
     show_edit_confirmation = request.method == 'POST' and request.POST.get('action') == 'edit' and bool(selected_quote_id)
     show_sanction_confirmation = request.method == 'POST' and request.POST.get('action') == 'sanction' and bool(selected_quote_id)
     show_secret_notes = action == 'secret_notes' and bool(selected_quote)
-    show_apply_discount = request.method == 'POST' and request.POST.get('action') == 'apply_discount' and bool(selected_quote_id)
+    show_apply_discount = action in {
+        'apply_discount', 'choose_discount_type', 'save_sanction_discount'
+    } and bool(selected_quote)
+    show_discount_amount_form = action in {
+        'choose_discount_type', 'save_sanction_discount'
+    } and bool(selected_quote)
+    selected_discount_type = None
+    sanction_discount_form = DiscountForm(instance=selected_quote) if selected_quote else DiscountForm()
+    # Check the discount type before showing the amount field
+    if show_discount_amount_form:
+        selected_discount_type = request.POST.get('discount_type')
+        valid_discount_types = dict(Quote.DiscountType.choices)
+        if selected_discount_type not in valid_discount_types:
+            return HttpResponseBadRequest('Invalid discount type.')
+        # Limit percentage entry in the browser as well as on the server
+        if selected_discount_type == Quote.DiscountType.PERCENT:
+            sanction_discount_form.fields['discount_amount'].widget.attrs['max'] = '100'
+    # Save a valid discount and update the quote total
+    if action == 'save_sanction_discount' and selected_quote:
+        sanction_discount_form = DiscountForm(request.POST, instance=selected_quote)
+        if selected_discount_type == Quote.DiscountType.PERCENT:
+            sanction_discount_form.fields['discount_amount'].widget.attrs['max'] = '100'
+        # Leave invalid submissions in the dialog so their errors can be shown
+        if sanction_discount_form.is_valid():
+            discounted_quote = sanction_discount_form.save(commit=False)
+            discounted_quote.final_price = discounted_quote.total_price()
+            discounted_quote.save(update_fields=[
+                'discount_type', 'discount_amount', 'final_price'
+            ])
+            return redirect(build_sanction_interface_url())
+    # Open the quote editor after the user confirms
     if request.method == 'POST' and request.POST.get('action') == 'confirm_edit' and selected_quote_id:
         quote_url = reverse('quote_view', kwargs={'pk': selected_quote_id})
         return redirect(f"{quote_url}?source=sanction")
-    if request.method == 'POST' and request.POST.get('action') == 'confirm_sanction' and selected_quote_ids:
+    # Sanction only a still-finalized quote and clear the selection
+    if request.method == 'POST' and request.POST.get('action') == 'confirm_sanction' and selected_quote_id:
         Quote.objects.filter(
             pk=selected_quote_id, status=Quote.Status.FINALIZED
         ).update(status=Quote.Status.SANCTIONED)
         request.session.pop(selection_session_key, None)
         selected_quote_id = None
-        selected_quote_ids = []
         selected_quote = None
+    # Show only finalized quotes and apply search and sorting
     quotes = Quote.objects.filter(status=Quote.Status.FINALIZED).select_related(
         'customer'
-    ).annotate(line_item_count=Count('line_items')).order_by(sort_order)
+    )
+    search = request.GET.get('search')
+    # Match the search term against customer, associate, or status
+    if search:
+        quotes = quotes.annotate(
+            sales_associate_name=Concat(
+                'sales_associate__user__first_name',
+                Value(' '),
+                'sales_associate__user__last_name',
+                output_field=CharField()
+            )
+        ).filter(
+            Q(sales_associate_name__icontains=search)
+            | Q(customer__name__icontains=search)
+            | Q(status__icontains=search)
+        )
+    quotes = quotes.annotate(line_item_count=Count('line_items')).order_by(sort_order)
     secret_notes = selected_quote.notes.order_by('-date_added') if selected_quote and show_secret_notes_view else []
-    sanction_interface_url = reverse('sanction_interface')
-    if request.GET:
-        sanction_interface_url = f"{sanction_interface_url}?{request.GET.urlencode()}"
-    return render(request, 'sanction_interface.html', {'show_no_quote_error': show_no_quote_error, 'show_edit_confirmation': show_edit_confirmation, 'show_sanction_confirmation': show_sanction_confirmation, 'show_secret_notes': show_secret_notes, 'show_secret_notes_view': show_secret_notes_view, 'show_add_secret_note': show_add_secret_note, 'show_delete_secret_note_confirmation': show_delete_secret_note_confirmation, 'pending_note': pending_note, 'secret_note_form': secret_note_form, 'selected_quote': selected_quote, 'secret_notes': secret_notes, 'show_apply_discount': show_apply_discount, 'quotes': quotes, 'selected_quote_ids': selected_quote_ids, 'sanction_interface_url': sanction_interface_url})
+    sanction_interface_url = build_sanction_interface_url()
+    return render(request, 'sanction_interface.html', {'show_no_quote_error': show_no_quote_error, 'show_edit_confirmation': show_edit_confirmation, 'show_sanction_confirmation': show_sanction_confirmation, 'show_secret_notes': show_secret_notes, 'show_secret_notes_view': show_secret_notes_view, 'show_add_secret_note': show_add_secret_note, 'show_delete_secret_note_confirmation': show_delete_secret_note_confirmation, 'pending_note': pending_note, 'secret_note_form': secret_note_form, 'selected_quote': selected_quote, 'selected_quote_id': selected_quote_id, 'secret_notes': secret_notes, 'show_apply_discount': show_apply_discount, 'show_discount_amount_form': show_discount_amount_form, 'selected_discount_type': selected_discount_type, 'sanction_discount_form': sanction_discount_form, 'quotes': quotes, 'sanction_interface_url': sanction_interface_url})
 
 # list sanctioned quotes
 @login_required
